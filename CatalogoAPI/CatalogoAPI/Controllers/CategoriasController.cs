@@ -20,7 +20,9 @@ namespace CatalogoAPI.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<Categoria>> Get()
         {
-            var categorias = _context.Categorias.ToList();
+            // AsNoTracking melhora a performance mas só deve ser usado em Gets
+            // Take limita a quantidade de resultados para não sobrecarregar o sistema.
+            var categorias = _context.Categorias.AsNoTracking().Take(10).ToList();
             if (categorias is null)
                 return NotFound("Categorias não encontradas...");
 
@@ -30,7 +32,10 @@ namespace CatalogoAPI.Controllers
         [HttpGet("produtos")]
         public ActionResult<IEnumerable<Categoria>> GetCategoriasProdutos()
         {
-            var categorias = _context.Categorias.Include(p => p.Produtos).ToList();
+            // Recomendado nunca retornar objetos relacionados sem um filtro,
+            // aqui está usando Where para retornar somente os id menor ou igual a 10.
+            var categorias = _context.Categorias.Include(p => p.Produtos)
+                .AsNoTracking().Where(c => c.CategoriaId <= 10).ToList();
             if (categorias is null)
                 return NotFound("Categorias não encontradas...");
 
@@ -43,7 +48,7 @@ namespace CatalogoAPI.Controllers
         {
             // First busca e retorna o primeiro resultado compativel, senao ele retorna uma excessão.
             // FirstOrDefault retorna o primeiro resultado compativel, senao ele retorna um null.
-            var categoria = _context.Categorias.FirstOrDefault(c => c.CategoriaId == id);
+            var categoria = _context.Categorias.AsNoTracking().FirstOrDefault(c => c.CategoriaId == id);
             if (categoria is null)
             {
                 return NotFound("Categoria não encontrado...");

@@ -30,7 +30,9 @@ namespace CatalogoAPI.Controllers
          */
         public ActionResult<IEnumerable<Produto>> Get()
         {
-            var produtos = _context.Produtos.ToList();
+            // AsNoTracking melhora a performance mas só deve ser usado em Gets
+            // Take limita a quantidade de resultados para não sobrecarregar o sistema.
+            var produtos = _context.Produtos.AsNoTracking().Take(10).ToList();
             if(produtos is null)
             {
                 return NotFound("Produtos não encontrados...");
@@ -44,7 +46,7 @@ namespace CatalogoAPI.Controllers
         {
             // First busca e retorna o primeiro resultado compativel, senao ele retorna uma excessão.
             // FirstOrDefault retorna o primeiro resultado compativel, senao ele retorna um null.
-            var produto = _context.Produtos.FirstOrDefault(p => p.ProdutoId == id);
+            var produto = _context.Produtos.AsNoTracking().FirstOrDefault(p => p.ProdutoId == id);
             if (produto is null)
             {
                 return NotFound("Produto não encontrado...");
