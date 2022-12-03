@@ -30,45 +30,71 @@ namespace CatalogoAPI.Controllers
          */
         public ActionResult<IEnumerable<Produto>> Get()
         {
-            // AsNoTracking melhora a performance mas só deve ser usado em Gets
-            // Take limita a quantidade de resultados para não sobrecarregar o sistema.
-            var produtos = _context.Produtos.AsNoTracking().Take(10).ToList();
-            if(produtos is null)
+            try
             {
-                return NotFound("Produtos não encontrados...");
+                // AsNoTracking melhora a performance mas só deve ser usado em Gets
+                // Take limita a quantidade de resultados para não sobrecarregar o sistema.
+                var produtos = _context.Produtos.AsNoTracking().Take(10).ToList();
+                if (produtos is null)
+                {
+                    return NotFound("Produtos não encontrados...");
+                }
+                return Ok(produtos);
             }
-            return Ok(produtos);
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Ocorreu um problema ao tratar a sua solicitação");
+            }
         }
 
         // Define que vai receber um id, e restringe a ser um inteiro.
         [HttpGet("{id:int}", Name ="ObterProduto")]
         public ActionResult<Produto> Get(int id)
         {
-            // First busca e retorna o primeiro resultado compativel, senao ele retorna uma excessão.
-            // FirstOrDefault retorna o primeiro resultado compativel, senao ele retorna um null.
-            var produto = _context.Produtos.AsNoTracking().FirstOrDefault(p => p.ProdutoId == id);
-            if (produto is null)
+            try
             {
-                return NotFound("Produto não encontrado...");
+                // First busca e retorna o primeiro resultado compativel, senao ele retorna uma excessão.
+                // FirstOrDefault retorna o primeiro resultado compativel, senao ele retorna um null.
+                var produto = _context.Produtos.AsNoTracking().FirstOrDefault(p => p.ProdutoId == id);
+                if (produto is null)
+                {
+                    return NotFound("Produto não encontrado...");
+                }
+                return Ok(produto);
             }
-            return Ok(produto);
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                                    "Ocorreu um problema ao tratar a sua solicitação");
+            }
+            
         }
 
         [HttpPost]
         public ActionResult Post(Produto produto)
         {
-            if (produto is null)
-                return BadRequest();
+            try
+            {
+                if (produto is null)
+                    return BadRequest();
 
-            _context.Produtos.Add(produto);
-            _context.SaveChanges();
+                _context.Produtos.Add(produto);
+                _context.SaveChanges();
 
-            // Similar ao CreatedAtAction mas informa uma rota para o nome
-            // definido na action get ao invés do nome da action,
-            // necessário aqui já que não estamos dando nomes especificos
-            // para as actions
-            return new CreatedAtRouteResult("ObterProduto",
-                new { id = produto.ProdutoId }, produto);
+                // Similar ao CreatedAtAction mas informa uma rota para o nome
+                // definido na action get ao invés do nome da action,
+                // necessário aqui já que não estamos dando nomes especificos
+                // para as actions
+                return new CreatedAtRouteResult("ObterProduto",
+                    new { id = produto.ProdutoId }, produto);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                                    "Ocorreu um problema ao tratar a sua solicitação");
+            }
+            
         }
 
 
@@ -76,36 +102,54 @@ namespace CatalogoAPI.Controllers
         [HttpPut("{id:int}")]
         public ActionResult Put(int id, Produto produto)
         {
-            // Quando enviar os dados do produto tem que
-            // informar o id do produto também.
-            // Então torna-se necessario conferir os id.
-            if(id != produto.ProdutoId)
+            try
             {
-                return BadRequest();
+                // Quando enviar os dados do produto tem que
+                // informar o id do produto também.
+                // Então torna-se necessario conferir os id.
+                if (id != produto.ProdutoId)
+                {
+                    return BadRequest();
+                }
+
+                // Como estamos trabalhando em um cenario "desconectado"
+                // (os dados estão dentro da variavel _context)
+                // o contexto precisa ser informado que produto está em um
+                // estado modificado. Para isso usamos o metodo Entry do contexto.
+                _context.Entry(produto).State = EntityState.Modified;
+                _context.SaveChanges();
+
+                return Ok(produto);
             }
-
-            // Como estamos trabalhando em um cenario "desconectado"
-            // (os dados estão dentro da variavel _context)
-            // o contexto precisa ser informado que produto está em um
-            // estado modificado. Para isso usamos o metodo Entry do contexto.
-            _context.Entry(produto).State = EntityState.Modified;
-            _context.SaveChanges();
-
-            return Ok(produto);
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                                    "Ocorreu um problema ao tratar a sua solicitação");
+            }
+            
         }
 
         [HttpDelete("{id:int}")]
         public ActionResult Delete(int id)
         {
-            var produto = _context.Produtos.FirstOrDefault(p => p.ProdutoId == id);
+            try
+            {
+                var produto = _context.Produtos.FirstOrDefault(p => p.ProdutoId == id);
 
-            if (produto is null)
-                return NotFound("Produto não localizado...");
+                if (produto is null)
+                    return NotFound("Produto não localizado...");
 
-            _context.Produtos.Remove(produto);
-            _context.SaveChanges();
+                _context.Produtos.Remove(produto);
+                _context.SaveChanges();
 
-            return Ok(produto);
+                return Ok(produto);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                                    "Ocorreu um problema ao tratar a sua solicitação");
+            }
+            
         }
 
     }
