@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace Models;
 public class Produto
@@ -33,5 +34,8 @@ public class Produto
 
     // Melhora a definição de qual categoria está vinculado a FK
     public int CategoriaId { get; set; }
+
+    // Ignora a propriedade durante a serialização e desserialização
+    [JsonIgnore]
     public Categoria? Categoria { get; set; }
 }
