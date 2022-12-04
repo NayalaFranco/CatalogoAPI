@@ -6,7 +6,7 @@ using Models;
 
 namespace CatalogoAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class CategoriasController : ControllerBase
     {
