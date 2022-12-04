@@ -75,7 +75,7 @@ namespace CatalogoAPI.Controllers
                 var categoria = _context.Categorias.AsNoTracking().FirstOrDefault(c => c.CategoriaId == id);
                 if (categoria is null)
                 {
-                    return NotFound("Categoria não encontrado...");
+                    return NotFound($"Categoria com id= {id} não localizada...");
                 }
                 return Ok(categoria);
             }
@@ -125,7 +125,7 @@ namespace CatalogoAPI.Controllers
                 // Então torna-se necessario conferir os id.
                 if (id != categoria.CategoriaId)
                 {
-                    return BadRequest();
+                    return BadRequest($"O id informado ({id}) não é o mesmo id recebido para atualização ({categoria.CategoriaId})");
                 }
 
                 // Como estamos trabalhando em um cenario "desconectado"
@@ -153,7 +153,7 @@ namespace CatalogoAPI.Controllers
                 var categoria = _context.Categorias.FirstOrDefault(c => c.CategoriaId == id);
 
                 if (categoria is null)
-                    return NotFound("Categoria não localizada...");
+                    return NotFound($"Categoria com id= {id} não localizada...");
 
                 _context.Categorias.Remove(categoria);
                 _context.SaveChanges();

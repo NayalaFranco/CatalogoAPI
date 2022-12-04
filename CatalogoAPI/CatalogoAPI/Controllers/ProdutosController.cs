@@ -59,7 +59,7 @@ namespace CatalogoAPI.Controllers
                 var produto = _context.Produtos.AsNoTracking().FirstOrDefault(p => p.ProdutoId == id);
                 if (produto is null)
                 {
-                    return NotFound("Produto não encontrado...");
+                    return NotFound($"Produto com id= {id} não localizado...");
                 }
                 return Ok(produto);
             }
@@ -109,7 +109,7 @@ namespace CatalogoAPI.Controllers
                 // Então torna-se necessario conferir os id.
                 if (id != produto.ProdutoId)
                 {
-                    return BadRequest();
+                    return BadRequest($"O id informado ({id}) não é o mesmo id recebido para atualização ({produto.ProdutoId})");
                 }
 
                 // Como estamos trabalhando em um cenario "desconectado"
@@ -137,7 +137,7 @@ namespace CatalogoAPI.Controllers
                 var produto = _context.Produtos.FirstOrDefault(p => p.ProdutoId == id);
 
                 if (produto is null)
-                    return NotFound("Produto não localizado...");
+                    return NotFound($"Produto com id= {id} não localizado...");
 
                 _context.Produtos.Remove(produto);
                 _context.SaveChanges();
