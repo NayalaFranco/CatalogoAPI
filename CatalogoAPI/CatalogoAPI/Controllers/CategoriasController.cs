@@ -17,8 +17,10 @@ namespace CatalogoAPI.Controllers
             _context = context;
         }
 
+        // Detalhes de Async/Task/Await na classe ProdutosController.
+
         [HttpGet]
-        public ActionResult<IEnumerable<Categoria>> Get()
+        public async Task<ActionResult<IEnumerable<Categoria>>> GetCategoriasAsync()
         {
             try
             {
@@ -26,7 +28,7 @@ namespace CatalogoAPI.Controllers
 
                 // AsNoTracking melhora a performance mas só deve ser usado em Gets
                 // Take limita a quantidade de resultados para não sobrecarregar o sistema.
-                var categorias = _context.Categorias.AsNoTracking().Take(10).ToList();
+                var categorias = await _context.Categorias.AsNoTracking().Take(10).ToListAsync();
                 if (categorias is null)
                     return NotFound("Categorias não encontradas...");
 
@@ -42,14 +44,14 @@ namespace CatalogoAPI.Controllers
         }
 
         [HttpGet("produtos")]
-        public ActionResult<IEnumerable<Categoria>> GetCategoriasProdutos()
+        public async Task<ActionResult<IEnumerable<Categoria>>> GetCategoriasProdutosAsync()
         {
             try
             {
                 // Recomendado nunca retornar objetos relacionados sem um filtro,
                 // aqui está usando Where para retornar somente os id menor ou igual a 10.
-                var categorias = _context.Categorias.Include(p => p.Produtos)
-                    .AsNoTracking().Where(c => c.CategoriaId <= 10).ToList();
+                var categorias = await _context.Categorias.Include(p => p.Produtos)
+                    .AsNoTracking().Where(c => c.CategoriaId <= 10).ToListAsync();
                 if (categorias is null)
                     return NotFound("Categorias não encontradas...");
 
@@ -66,13 +68,13 @@ namespace CatalogoAPI.Controllers
 
         // Define que vai receber um id, e restringe a ser um inteiro.
         [HttpGet("{id:int}", Name = "ObterCategoria")]
-        public ActionResult<Categoria> Get(int id)
+        public async Task<ActionResult<Categoria>> GetCategoriasIdAsync(int id)
         {
             try
             {
                 // First busca e retorna o primeiro resultado compativel, senao ele retorna uma excessão.
                 // FirstOrDefault retorna o primeiro resultado compativel, senao ele retorna um null.
-                var categoria = _context.Categorias.AsNoTracking().FirstOrDefault(c => c.CategoriaId == id);
+                var categoria = await _context.Categorias.AsNoTracking().FirstOrDefaultAsync(c => c.CategoriaId == id);
                 if (categoria is null)
                 {
                     return NotFound($"Categoria com id= {id} não localizada...");
@@ -88,7 +90,7 @@ namespace CatalogoAPI.Controllers
         }
 
         [HttpPost]
-        public ActionResult Post(Categoria categoria)
+        public async Task<ActionResult> PostCategoriaAsync(Categoria categoria)
         {
             try
             {
@@ -96,7 +98,7 @@ namespace CatalogoAPI.Controllers
                     return BadRequest();
 
                 _context.Categorias.Add(categoria);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
 
                 // Similar ao CreatedAtAction mas informa uma rota para o nome
                 // definido na action get ao invés do nome da action,
@@ -116,7 +118,7 @@ namespace CatalogoAPI.Controllers
 
         // Put = Atualização COMPLETA do categoria (não permite parcial)
         [HttpPut("{id:int}")]
-        public ActionResult Put(int id, Categoria categoria)
+        public async Task<ActionResult> PutCategoriaAsync(int id, Categoria categoria)
         {
             try
             {
@@ -133,7 +135,7 @@ namespace CatalogoAPI.Controllers
                 // o contexto precisa ser informado que categoria está em um
                 // estado modificado. Para isso usamos o metodo Entry do contexto.
                 _context.Entry(categoria).State = EntityState.Modified;
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
 
                 return Ok(categoria);
             }
@@ -146,17 +148,17 @@ namespace CatalogoAPI.Controllers
         }
 
         [HttpDelete("{id:int}")]
-        public ActionResult Delete(int id)
+        public async Task<ActionResult> DeleteCategoriaAsync(int id)
         {
             try
             {
-                var categoria = _context.Categorias.FirstOrDefault(c => c.CategoriaId == id);
+                var categoria = await _context.Categorias.FirstOrDefaultAsync(c => c.CategoriaId == id);
 
                 if (categoria is null)
                     return NotFound($"Categoria com id= {id} não localizada...");
 
                 _context.Categorias.Remove(categoria);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
 
                 return Ok(categoria);
             }

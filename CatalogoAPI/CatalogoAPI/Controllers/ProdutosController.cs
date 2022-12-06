@@ -27,14 +27,18 @@ namespace CatalogoAPI.Controllers
          * 2- IEnumerable permite adiar a execução, ou seja, ele vai trabalhar por demanda.
          * 3- E usando IEnumerable não precisa ter toda a coleção na memória.
          * Daria para usar List mas IEnumerable AQUI é mais otimizado.
+         * * * * * *
+         * async torna o metodo assíncrono, Task é necessario nesse cenario assíncrono
          */
-        public ActionResult<IEnumerable<Produto>> Get()
+        public async Task<ActionResult<IEnumerable<Produto>>> GetProdutosAsync()
         {
             try
             {
                 // AsNoTracking melhora a performance mas só deve ser usado em Gets
                 // Take limita a quantidade de resultados para não sobrecarregar o sistema.
-                var produtos = _context.Produtos.AsNoTracking().Take(10).ToList();
+                // await aguarda a resposta do servidor em um metodo async,
+                // ToListAsync() é necessario em metodos async.
+                var produtos = await _context.Produtos.AsNoTracking().Take(10).ToListAsync();
                 if (produtos is null)
                 {
                     return NotFound("Produtos não encontrados...");
@@ -50,13 +54,13 @@ namespace CatalogoAPI.Controllers
 
         // Define que vai receber um id, e restringe a ser um inteiro.
         [HttpGet("{id:int}", Name ="ObterProduto")]
-        public ActionResult<Produto> Get(int id)
+        public async Task<ActionResult<Produto>> GetProdutoIdAsync(int id)
         {
             try
             {
                 // First busca e retorna o primeiro resultado compativel, senao ele retorna uma excessão.
                 // FirstOrDefault retorna o primeiro resultado compativel, senao ele retorna um null.
-                var produto = _context.Produtos.AsNoTracking().FirstOrDefault(p => p.ProdutoId == id);
+                var produto = await _context.Produtos.AsNoTracking().FirstOrDefaultAsync(p => p.ProdutoId == id);
                 if (produto is null)
                 {
                     return NotFound($"Produto com id= {id} não localizado...");
@@ -72,15 +76,18 @@ namespace CatalogoAPI.Controllers
         }
 
         [HttpPost]
-        public ActionResult Post(Produto produto)
+        public async Task<ActionResult> PostProdutoAsync(Produto produto)
         {
             try
             {
                 if (produto is null)
                     return BadRequest();
 
+                // Como o context está na memoria não é necessario
+                // que o Add seja AddAsync, apenas o SaveChanges 
+                // pois é ele que vai salvar no banco de dados.
                 _context.Produtos.Add(produto);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
 
                 // Similar ao CreatedAtAction mas informa uma rota para o nome
                 // definido na action get ao invés do nome da action,
@@ -100,7 +107,7 @@ namespace CatalogoAPI.Controllers
 
         // Put = Atualização COMPLETA do produto (não permite parcial)
         [HttpPut("{id:int}")]
-        public ActionResult Put(int id, Produto produto)
+        public async Task<ActionResult> PutProdutoAsync(int id, Produto produto)
         {
             try
             {
@@ -117,7 +124,7 @@ namespace CatalogoAPI.Controllers
                 // o contexto precisa ser informado que produto está em um
                 // estado modificado. Para isso usamos o metodo Entry do contexto.
                 _context.Entry(produto).State = EntityState.Modified;
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
 
                 return Ok(produto);
             }
@@ -130,17 +137,18 @@ namespace CatalogoAPI.Controllers
         }
 
         [HttpDelete("{id:int}")]
-        public ActionResult Delete(int id)
+        public async Task<ActionResult> DeleteProdutoAsync(int id)
         {
             try
             {
-                var produto = _context.Produtos.FirstOrDefault(p => p.ProdutoId == id);
+                // await somente onde tem que aguardar uma operação externa.
+                var produto = await _context.Produtos.FirstOrDefaultAsync(p => p.ProdutoId == id);
 
                 if (produto is null)
                     return NotFound($"Produto com id= {id} não localizado...");
 
                 _context.Produtos.Remove(produto);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
 
                 return Ok(produto);
             }
