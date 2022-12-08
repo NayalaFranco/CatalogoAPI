@@ -1,3 +1,4 @@
+using CatalogoAPI.Validations;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
@@ -11,12 +12,14 @@ public class Produto
     // Obs: o Id tem que ser depois do nome, antes o EF n reconhece.
     public int ProdutoId { get; set; }
 
-    [Required]
-    [StringLength(100)]
+    [Required(ErrorMessage = "O nome do produto é obrigatório!")]
+    [StringLength(100, MinimumLength =2, ErrorMessage = "O nome deve ter no mínimo 2 e no máximo 100 caracteres.")]
+    // Meu atributo personalizado
+    [PrimeiraLetraMaiuscula]
     public string? Nome { get; set; }
 
-    [Required]
-    [StringLength(300)]
+    [Required(ErrorMessage = "A descrição é obrigatória!")]
+    [StringLength(300, MinimumLength = 5, ErrorMessage = "A descrição deve ter no mínimo 5 e no máximo 300 caracteres.")]
     public string? Descricao { get; set; }
 
     // DataAnnotation para definir a precisão do tipo decimal no DB
@@ -24,7 +27,7 @@ public class Produto
     [Column(TypeName = "decimal(10,4)")]
     public decimal Preco { get; set; }
 
-    [Required]
+    [Required(ErrorMessage = "Uma URL de imagem é obrigatória!")]
     [StringLength(300)]
     public string? ImagemUrl { get; set; }
 
