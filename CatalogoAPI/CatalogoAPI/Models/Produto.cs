@@ -1,10 +1,12 @@
 using CatalogoAPI.Validations;
+using Microsoft.OpenApi.Validations;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
 namespace Models;
-public class Produto
+// IValidatableObject serve para criar validação de propriedades a nivel de Model
+public class Produto : IValidatableObject
 {
     // ao colocar uma propriedade int com o nome de Id
     // ou AlgumNomeId o EF automaticamente reconhece
@@ -41,4 +43,45 @@ public class Produto
     // Ignora a propriedade durante a serialização e desserialização
     [JsonIgnore]
     public Categoria? Categoria { get; set; }
+
+
+    // Sistema de validação a nivel de Model
+    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+    {
+        //if (!string.IsNullOrEmpty(this.Nome))
+        //{
+        //    var primeiraLetra = this.Nome[0].ToString();
+        //    if (primeiraLetra != primeiraLetra.ToUpper())
+        //    {
+        //        yield return new
+        //          ValidationResult("Aprimeira letra do produto deve ser maiúscula",
+        //          new[]
+        //          { nameof(this.Nome) }
+        //          );
+        //    }
+        //}
+
+        if (this.Estoque <= 0)
+        {
+            yield return new
+                ValidationResult("O estoque deve ser maior que zero",
+                new[]
+                { nameof(this.Estoque) }
+                );
+        }
+
+        // exemplo de interação de propriedades que
+        // essa forma de validação permite e a via Atributo não
+        // "Easter Egg"
+        if (this.Nome == "Café" && this.Estoque == 0)
+        {
+            yield return new
+                ValidationResult("CAFÉÉÉÉ!!! QUERO CAFÉÉÉ!!! NÃO TEM CAFÉÉÉ!!!!!!!!!",
+                new[]
+                { "Easter Egg" });
+        }
+
+    }
+
 }
+
