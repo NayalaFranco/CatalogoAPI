@@ -1,10 +1,13 @@
 using CatalogoAPI.Context;
+using CatalogoAPI.Filters;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+
+builder.Services.AddScoped<ApiLoggingFilter>();
 
 builder.Services.AddDbContext<CatalogoAPIContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));

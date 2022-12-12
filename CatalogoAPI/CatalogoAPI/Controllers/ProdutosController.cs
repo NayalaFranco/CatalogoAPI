@@ -1,5 +1,5 @@
 ﻿using CatalogoAPI.Context;
-using Microsoft.AspNetCore.Http;
+using CatalogoAPI.Filters;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Models;
@@ -19,6 +19,7 @@ namespace CatalogoAPI.Controllers
 
 
         [HttpGet]
+        [ServiceFilter(typeof(ApiLoggingFilter))]
         /* ActionResult retorna os metodos action como BadRequest e NotFound
          * E também o tipo que ele estiver definido.
          * * * * * *
