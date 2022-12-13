@@ -34,7 +34,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.ConfigureExceptionHander();
+app.ConfigureExceptionHandler();
 
 app.UseHttpsRedirection();
 

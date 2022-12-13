@@ -13,7 +13,7 @@ namespace CatalogoAPI.Extensions
     public static class ApiExceptionMiddlewareExtensions
     {
         // o método também tem que ser estático
-        public static void ConfigureExceptionHander(this IApplicationBuilder app)
+        public static void ConfigureExceptionHandler(this IApplicationBuilder app)
         {
             // Aqui estamos usando o middleware
             app.UseExceptionHandler(appError =>
