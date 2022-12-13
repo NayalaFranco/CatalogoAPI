@@ -1,4 +1,5 @@
 using CatalogoAPI.Context;
+using CatalogoAPI.Extensions;
 using CatalogoAPI.Filters;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
@@ -32,6 +33,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.ConfigureExceptionHander();
 
 app.UseHttpsRedirection();
 

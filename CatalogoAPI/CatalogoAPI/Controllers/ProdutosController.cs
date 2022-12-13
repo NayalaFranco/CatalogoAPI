@@ -33,76 +33,52 @@ namespace CatalogoAPI.Controllers
          */
         public async Task<ActionResult<IEnumerable<Produto>>> GetProdutosAsync()
         {
-            try
+            // AsNoTracking melhora a performance mas só deve ser usado em Gets
+            // Take limita a quantidade de resultados para não sobrecarregar o sistema.
+            // await aguarda a resposta do servidor em um metodo async,
+            // ToListAsync() é necessario em metodos async.
+            var produtos = await _context.Produtos.AsNoTracking().Take(10).ToListAsync();
+            if (produtos is null)
             {
-                // AsNoTracking melhora a performance mas só deve ser usado em Gets
-                // Take limita a quantidade de resultados para não sobrecarregar o sistema.
-                // await aguarda a resposta do servidor em um metodo async,
-                // ToListAsync() é necessario em metodos async.
-                var produtos = await _context.Produtos.AsNoTracking().Take(10).ToListAsync();
-                if (produtos is null)
-                {
-                    return NotFound("Produtos não encontrados...");
-                }
-                return Ok(produtos);
+                return NotFound("Produtos não encontrados...");
             }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    "Ocorreu um problema ao tratar a sua solicitação");
-            }
+            return Ok(produtos);
         }
 
         // Define que vai receber um id, e restringe a ser um inteiro.
-        [HttpGet("{id:int}", Name ="ObterProduto")]
+        [HttpGet("{id:int}", Name = "ObterProduto")]
         public async Task<ActionResult<Produto>> GetProdutoIdAsync(int id)
         {
-            try
+            // First busca e retorna o primeiro resultado compativel, senao ele retorna uma excessão.
+            // FirstOrDefault retorna o primeiro resultado compativel, senao ele retorna um null.
+            var produto = await _context.Produtos.AsNoTracking().FirstOrDefaultAsync(p => p.ProdutoId == id);
+            if (produto is null)
             {
-                // First busca e retorna o primeiro resultado compativel, senao ele retorna uma excessão.
-                // FirstOrDefault retorna o primeiro resultado compativel, senao ele retorna um null.
-                var produto = await _context.Produtos.AsNoTracking().FirstOrDefaultAsync(p => p.ProdutoId == id);
-                if (produto is null)
-                {
-                    return NotFound($"Produto com id= {id} não localizado...");
-                }
-                return Ok(produto);
+                return NotFound($"Produto com id= {id} não localizado...");
             }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                                    "Ocorreu um problema ao tratar a sua solicitação");
-            }
-            
+            return Ok(produto);
+
         }
 
         [HttpPost]
         public async Task<ActionResult> PostProdutoAsync(Produto produto)
         {
-            try
-            {
-                if (produto is null)
-                    return BadRequest();
+            if (produto is null)
+                return BadRequest();
 
-                // Como o context está na memoria não é necessario
-                // que o Add seja AddAsync, apenas o SaveChanges 
-                // pois é ele que vai salvar no banco de dados.
-                _context.Produtos.Add(produto);
-                await _context.SaveChangesAsync();
+            // Como o context está na memoria não é necessario
+            // que o Add seja AddAsync, apenas o SaveChanges 
+            // pois é ele que vai salvar no banco de dados.
+            _context.Produtos.Add(produto);
+            await _context.SaveChangesAsync();
 
-                // Similar ao CreatedAtAction mas informa uma rota para o nome
-                // definido na action get ao invés do nome da action,
-                // necessário aqui já que não estamos dando nomes especificos
-                // para as actions
-                return new CreatedAtRouteResult("ObterProduto",
-                    new { id = produto.ProdutoId }, produto);
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                                    "Ocorreu um problema ao tratar a sua solicitação");
-            }
-            
+            // Similar ao CreatedAtAction mas informa uma rota para o nome
+            // definido na action get ao invés do nome da action,
+            // necessário aqui já que não estamos dando nomes especificos
+            // para as actions
+            return new CreatedAtRouteResult("ObterProduto",
+                new { id = produto.ProdutoId }, produto);
+
         }
 
 
@@ -110,55 +86,40 @@ namespace CatalogoAPI.Controllers
         [HttpPut("{id:int}")]
         public async Task<ActionResult> PutProdutoAsync(int id, Produto produto)
         {
-            try
+            // Quando enviar os dados do produto tem que
+            // informar o id do produto também.
+            // Então torna-se necessario conferir os id.
+            if (id != produto.ProdutoId)
             {
-                // Quando enviar os dados do produto tem que
-                // informar o id do produto também.
-                // Então torna-se necessario conferir os id.
-                if (id != produto.ProdutoId)
-                {
-                    return BadRequest($"O id informado ({id}) não é o mesmo id recebido para atualização ({produto.ProdutoId})");
-                }
-
-                // Como estamos trabalhando em um cenario "desconectado"
-                // (os dados estão dentro da variavel _context)
-                // o contexto precisa ser informado que produto está em um
-                // estado modificado. Para isso usamos o metodo Entry do contexto.
-                _context.Entry(produto).State = EntityState.Modified;
-                await _context.SaveChangesAsync();
-
-                return Ok(produto);
+                return BadRequest($"O id informado ({id}) não é o mesmo id recebido para atualização ({produto.ProdutoId})");
             }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                                    "Ocorreu um problema ao tratar a sua solicitação");
-            }
-            
+
+            // Como estamos trabalhando em um cenario "desconectado"
+            // (os dados estão dentro da variavel _context)
+            // o contexto precisa ser informado que produto está em um
+            // estado modificado. Para isso usamos o metodo Entry do contexto.
+            _context.Entry(produto).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+
+            return Ok(produto);
+
+
         }
 
         [HttpDelete("{id:int}")]
         public async Task<ActionResult> DeleteProdutoAsync(int id)
         {
-            try
-            {
-                // await somente onde tem que aguardar uma operação externa.
-                var produto = await _context.Produtos.FirstOrDefaultAsync(p => p.ProdutoId == id);
+            // await somente onde tem que aguardar uma operação externa.
+            var produto = await _context.Produtos.FirstOrDefaultAsync(p => p.ProdutoId == id);
 
-                if (produto is null)
-                    return NotFound($"Produto com id= {id} não localizado...");
+            if (produto is null)
+                return NotFound($"Produto com id= {id} não localizado...");
 
-                _context.Produtos.Remove(produto);
-                await _context.SaveChangesAsync();
+            _context.Produtos.Remove(produto);
+            await _context.SaveChangesAsync();
 
-                return Ok(produto);
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                                    "Ocorreu um problema ao tratar a sua solicitação");
-            }
-            
+            return Ok(produto);
+
         }
 
     }
