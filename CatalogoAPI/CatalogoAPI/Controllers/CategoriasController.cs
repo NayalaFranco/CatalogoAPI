@@ -10,10 +10,12 @@ namespace CatalogoAPI.Controllers
     public class CategoriasController : ControllerBase
     {
         private readonly CatalogoAPIContext _context;
+        private readonly ILogger _logger;
 
-        public CategoriasController(CatalogoAPIContext context)
+        public CategoriasController(CatalogoAPIContext context, ILogger<CategoriasController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         // Detalhes de Async/Task/Await na classe ProdutosController.
@@ -22,6 +24,9 @@ namespace CatalogoAPI.Controllers
         public async Task<ActionResult<IEnumerable<Categoria>>> GetCategoriasAsync()
         {
             //throw new Exception();
+
+            // isso será logado no console
+            _logger.LogInformation("========== GET api/categorias =============");
 
             // AsNoTracking melhora a performance mas só deve ser usado em Gets
             // Take limita a quantidade de resultados para não sobrecarregar o sistema.
@@ -52,8 +57,12 @@ namespace CatalogoAPI.Controllers
             // First busca e retorna o primeiro resultado compativel, senao ele retorna uma excessão.
             // FirstOrDefault retorna o primeiro resultado compativel, senao ele retorna um null.
             var categoria = await _context.Categorias.AsNoTracking().FirstOrDefaultAsync(c => c.CategoriaId == id);
+
+            _logger.LogInformation($"========== GET api/categorias/id = {id} =============");
+
             if (categoria is null)
             {
+                _logger.LogInformation($"========== GET api/categorias/id = {id} NOT FOUND =============");
                 return NotFound($"Categoria com id= {id} não localizada...");
             }
             return Ok(categoria);
