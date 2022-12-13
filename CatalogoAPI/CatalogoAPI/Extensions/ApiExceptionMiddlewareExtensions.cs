@@ -3,7 +3,10 @@ using Microsoft.AspNetCore.Diagnostics;
 using System.Net;
 
 
-/* Esse middleware serve para "tratar" erros de forma global
+/* Isso é uma extensão do middleware UseExceptionHandler
+ * ela adiciona aprimoramentos ao middleware original nativo
+ * para retornar os dados da forma que nós queremos.
+ * Essa extensão serve para "tratar" erros de forma global
  * nesse caso são erros não esperados, por exemplo erro na conexão,
  * entra no lugar do trycatch que retornava o status code 500.
  */

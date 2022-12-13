@@ -34,6 +34,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+// chamando a extensão do middleware
 app.ConfigureExceptionHandler();
 
 app.UseHttpsRedirection();
