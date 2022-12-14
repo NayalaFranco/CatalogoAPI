@@ -27,8 +27,10 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // Ativando o logging
+// adiciona o provider e sua configuração
 builder.Logging.AddProvider(new CustomLoggerProvider(new CustomLoggerProviderConfiguration
 {
+    // atribui o nivel de log para information
     LogLevel = LogLevel.Information
 }));
 

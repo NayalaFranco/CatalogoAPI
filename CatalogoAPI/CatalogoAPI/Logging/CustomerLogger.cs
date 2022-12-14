@@ -1,5 +1,6 @@
 ﻿namespace CatalogoAPI.Logging
 {
+    // Implementa a interface ILogger
     public class CustomerLogger : ILogger
     {
         readonly string loggerName;
@@ -21,9 +22,11 @@
             return logLevel == loggerConfig.LogLevel;
         }
 
+        // Método da propria interface que o sistema irá executar com nosso código
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state,
             Exception exception, Func<TState, Exception, string> formatter)
         {
+            // Formatando a mensagem do log
             string mensagem = $"{logLevel.ToString()}: {eventId.Id} - {formatter(state, exception)}";
 
             EscreverTextoNoArquivo(mensagem);
@@ -31,11 +34,15 @@
 
         private void EscreverTextoNoArquivo(string mensagem)
         {
+            // caminho onde vai salvar o log
             string caminhoArquivoLog = @"c:\TestesLogs\CatalogoAPI_Log.txt";
+
+            // Escopo instanciando o StreamWriter que estamos usando para escrever no arquivo de texto.
             using (StreamWriter streamWriter = new StreamWriter(caminhoArquivoLog, true))
             {
                 try
                 {
+                    // Escreve mensagem no arquivo de texto.
                     streamWriter.WriteLine(mensagem);
                     streamWriter.Close();
                 }
