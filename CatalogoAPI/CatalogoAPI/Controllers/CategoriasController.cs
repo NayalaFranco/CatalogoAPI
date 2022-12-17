@@ -1,4 +1,5 @@
 ﻿using CatalogoAPI.Context;
+using CatalogoAPI.Repository;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Models;
@@ -9,14 +10,114 @@ namespace CatalogoAPI.Controllers
     [ApiController]
     public class CategoriasController : ControllerBase
     {
-        private readonly CatalogoAPIContext _context;
+        private readonly IUnitOfWork _uow;
         private readonly ILogger _logger;
 
-        public CategoriasController(CatalogoAPIContext context, ILogger<CategoriasController> logger)
+        public CategoriasController(IUnitOfWork context, ILogger<CategoriasController> logger)
         {
-            _context = context;
+            _uow = context;
             _logger = logger;
         }
+
+
+        [HttpGet]
+        public ActionResult<IEnumerable<Categoria>> GetCategorias()
+        {
+            //throw new Exception();
+
+            // isso será logado no console
+            _logger.LogInformation("========== GET api/categorias =============");
+
+            // Take limita a quantidade de resultados para não sobrecarregar o sistema.
+            var categorias = _uow.CategoriaRepository.Get().Take(10).ToList();
+            if (categorias is null)
+                return NotFound("Categorias não encontradas...");
+
+            return Ok(categorias);
+        }
+
+        [HttpGet("produtos")]
+        public ActionResult<IEnumerable<Categoria>> GetCategoriasProdutos()
+        {
+            // Recomendado nunca retornar objetos relacionados sem um filtro,
+            // aqui está usando Where para retornar somente os id menor ou igual a 10.
+            var categorias = _uow.CategoriaRepository.GetCategoriasProdutos()
+                .Where(c => c.CategoriaId <= 10).ToList();
+            if (categorias is null)
+                return NotFound("Categorias não encontradas...");
+
+            return Ok(categorias);
+        }
+
+        // Define que vai receber um id, e restringe a ser um inteiro.
+        [HttpGet("{id:int}", Name = "ObterCategoria")]
+        public ActionResult<Categoria> GetCategoriasId(int id)
+        {
+
+            var categoria = _uow.CategoriaRepository.GetById(c => c.CategoriaId == id);
+
+            _logger.LogInformation($"========== GET api/categorias/id = {id} =============");
+
+            if (categoria is null)
+            {
+                _logger.LogInformation($"========== GET api/categorias/id = {id} NOT FOUND =============");
+                return NotFound($"Categoria com id= {id} não localizada...");
+            }
+            return Ok(categoria);
+
+        }
+
+        [HttpPost]
+        public ActionResult PostCategoria(Categoria categoria)
+        {
+            if (categoria is null)
+                return BadRequest();
+
+            _uow.CategoriaRepository.Add(categoria);
+            _uow.Commit();
+
+            // Similar ao CreatedAtAction mas informa uma rota para o nome
+            // definido na action get ao invés do nome da action,
+            // necessário aqui já que não estamos dando nomes especificos
+            // para as actions
+            return new CreatedAtRouteResult("ObterCategoria",
+                new { id = categoria.CategoriaId }, categoria);
+        }
+
+
+        // Put = Atualização COMPLETA do categoria (não permite parcial)
+        [HttpPut("{id:int}")]
+        public ActionResult PutCategoria(int id, Categoria categoria)
+        {
+            // Quando enviar os dados do categoria tem que
+            // informar o id do categoria também.
+            // Então torna-se necessario conferir os id.
+            if (id != categoria.CategoriaId)
+            {
+                return BadRequest($"O id informado ({id}) não é o mesmo id recebido para atualização ({categoria.CategoriaId})");
+            }
+
+            _uow.CategoriaRepository.Update(categoria);
+            _uow.Commit();
+
+            return Ok(categoria);
+        }
+
+        [HttpDelete("{id:int}")]
+        public ActionResult DeleteCategoria(int id)
+        {
+            var categoria = _uow.CategoriaRepository.GetById(c => c.CategoriaId == id);
+
+            if (categoria is null)
+                return NotFound($"Categoria com id= {id} não localizada...");
+
+            _uow.CategoriaRepository.Delete(categoria);
+            _uow.Commit();
+
+            return Ok(categoria);
+        }
+
+        /*
 
         // Detalhes de Async/Task/Await na classe ProdutosController.
 
@@ -122,5 +223,7 @@ namespace CatalogoAPI.Controllers
 
             return Ok(categoria);
         }
+
+        */
     }
 }
