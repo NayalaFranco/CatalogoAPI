@@ -29,6 +29,7 @@ namespace CatalogoAPI.Controllers
          */
         public ActionResult<IEnumerable<Produto>> GetProdutos()
         {
+            // Agora com o padrão repository usa o ProdutoRepository.Get() para essa operação
             var produtos = _uow.ProdutoRepository.Get().ToList();
             if (produtos is null)
             {

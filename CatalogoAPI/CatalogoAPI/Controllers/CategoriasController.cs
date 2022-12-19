@@ -1,7 +1,5 @@
-﻿using CatalogoAPI.Context;
-using CatalogoAPI.Repository;
+﻿using CatalogoAPI.Repository;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Models;
 
 namespace CatalogoAPI.Controllers
@@ -29,6 +27,7 @@ namespace CatalogoAPI.Controllers
             _logger.LogInformation("========== GET api/categorias =============");
 
             // Take limita a quantidade de resultados para não sobrecarregar o sistema.
+            // esse get é o get do repositório
             var categorias = _uow.CategoriaRepository.Get().Take(10).ToList();
             if (categorias is null)
                 return NotFound("Categorias não encontradas...");
