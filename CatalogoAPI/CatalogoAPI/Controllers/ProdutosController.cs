@@ -1,4 +1,6 @@
-﻿using CatalogoAPI.Filters;
+﻿using AutoMapper;
+using CatalogoAPI.DTOs;
+using CatalogoAPI.Filters;
 using CatalogoAPI.Repository;
 using Microsoft.AspNetCore.Mvc;
 using Models;
@@ -10,10 +12,13 @@ namespace CatalogoAPI.Controllers
     public class ProdutosController : ControllerBase
     {
         private readonly IUnitOfWork _uow;
+        // AutoMapper
+        private readonly IMapper _mapper;
 
-        public ProdutosController(IUnitOfWork context)
+        public ProdutosController(IUnitOfWork context, IMapper mapper)
         {
             _uow = context;
+            _mapper = mapper;
         }
 
         [HttpGet]
@@ -27,7 +32,7 @@ namespace CatalogoAPI.Controllers
          * 3- E usando IEnumerable não precisa ter toda a coleção na memória.
          * Daria para usar List mas IEnumerable AQUI é mais otimizado.
          */
-        public ActionResult<IEnumerable<Produto>> GetProdutos()
+        public ActionResult<IEnumerable<ProdutoDTO>> GetProdutos()
         {
             // Agora com o padrão repository usa o ProdutoRepository.Get() para essa operação
             var produtos = _uow.ProdutoRepository.Get().ToList();
@@ -35,70 +40,82 @@ namespace CatalogoAPI.Controllers
             {
                 return NotFound("Produtos não encontrados...");
             }
-            return Ok(produtos);
+            var produtosDto = _mapper.Map<List<ProdutoDTO>>(produtos);
+            return Ok(produtosDto);
         }
 
         [HttpGet("menorpreco")]
-        public ActionResult<IEnumerable<Produto>> GetProdutosPrecos()
+        public ActionResult<IEnumerable<ProdutoDTO>> GetProdutosPrecos()
         {
-            return _uow.ProdutoRepository.GetProdutosPorPreco().ToList();
+            var produtos = _uow.ProdutoRepository.GetProdutosPorPreco().ToList();
+            var produtosDto = _mapper.Map<List<ProdutoDTO>>(produtos);
+
+            return produtosDto;
+
         }
 
         // Define que vai receber um id, e restringe a ser um inteiro.
         [HttpGet("{id:int}", Name = "ObterProduto")]
-        public ActionResult<Produto> GetProdutoIdAsync(int id)
+        public ActionResult<ProdutoDTO> GetProdutoId(int id)
         {
             var produto = _uow.ProdutoRepository.GetById(p => p.ProdutoId == id);
             if (produto is null)
             {
                 return NotFound($"Produto com id= {id} não localizado...");
             }
-            return Ok(produto);
+            var produtoDto = _mapper.Map<ProdutoDTO>(produto);
+            return Ok(produtoDto);
 
         }
 
         [HttpPost]
-        public ActionResult PostProdutoAsync(Produto produto)
+        public ActionResult PostProduto(ProdutoDTO produtoDto)
         {
-            if (produto is null)
+            if (produtoDto is null)
                 return BadRequest();
 
-            
+            // Inverte o mapeamento aqui
+            var produto = _mapper.Map<Produto>(produtoDto);
+
             _uow.ProdutoRepository.Add(produto);
             _uow.Commit();
+
+            //produtoDto = _mapper.Map<ProdutoDTO>(produto);
 
             // Similar ao CreatedAtAction mas informa uma rota para o nome
             // definido na action get ao invés do nome da action,
             // necessário aqui já que não estamos dando nomes especificos
             // para as actions
             return new CreatedAtRouteResult("ObterProduto",
-                new { id = produto.ProdutoId }, produto);
+                new { id = produto.ProdutoId }, produtoDto);
 
         }
 
 
         // Put = Atualização COMPLETA do produto (não permite parcial)
         [HttpPut("{id:int}")]
-        public ActionResult PutProdutoAsync(int id, Produto produto)
+        public ActionResult PutProduto(int id, ProdutoDTO produtoDto)
         {
             // Quando enviar os dados do produto tem que
             // informar o id do produto também.
             // Então torna-se necessario conferir os id.
-            if (id != produto.ProdutoId)
+            if (id != produtoDto.ProdutoId)
             {
-                return BadRequest($"O id informado ({id}) não é o mesmo id recebido para atualização ({produto.ProdutoId})");
+                return BadRequest($"O id informado ({id}) não é o mesmo id recebido para atualização ({produtoDto.ProdutoId})");
             }
+
+            var produto = _mapper.Map<Produto>(produtoDto);
 
             _uow.ProdutoRepository.Update(produto);
             _uow.Commit();
 
-            return Ok(produto);
+            return Ok(produtoDto);
 
 
         }
 
         [HttpDelete("{id:int}")]
-        public ActionResult DeleteProdutoAsync(int id)
+        public ActionResult DeleteProduto(int id)
         { 
             var produto = _uow.ProdutoRepository.GetById(p => p.ProdutoId == id);
 
@@ -108,7 +125,9 @@ namespace CatalogoAPI.Controllers
             _uow.ProdutoRepository.Delete(produto);
             _uow.Commit();
 
-            return Ok(produto);
+            var produtoDto = _mapper.Map<ProdutoDTO>(produto);
+
+            return Ok(produtoDto);
         }
 
 

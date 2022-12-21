@@ -1,4 +1,6 @@
+using AutoMapper;
 using CatalogoAPI.Context;
+using CatalogoAPI.DTOs.Mappings;
 using CatalogoAPI.Extensions;
 using CatalogoAPI.Filters;
 using CatalogoAPI.Logging;
@@ -10,10 +12,21 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
+// Registrando o serviço de filtro
 builder.Services.AddScoped<ApiLoggingFilter>();
 
+// Registrando o serviço da Unit of Work
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
+// Registrando o serviço do AutoMapper
+var mappingConfig = new MapperConfiguration(mc =>
+{
+    mc.AddProfile(new MappingProfile());
+});
+IMapper mapper = mappingConfig.CreateMapper();
+builder.Services.AddSingleton(mapper);
+
+// Registrando a Connection String
 builder.Services.AddDbContext<CatalogoAPIContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
@@ -46,7 +59,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-// chamando a extensão do middleware
+// Chamando a extensão do middleware
 app.ConfigureExceptionHandler();
 
 app.UseHttpsRedirection();

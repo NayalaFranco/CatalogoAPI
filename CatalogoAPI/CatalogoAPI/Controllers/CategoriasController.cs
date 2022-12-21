@@ -1,4 +1,6 @@
-﻿using CatalogoAPI.Repository;
+﻿using AutoMapper;
+using CatalogoAPI.DTOs;
+using CatalogoAPI.Repository;
 using Microsoft.AspNetCore.Mvc;
 using Models;
 
@@ -10,16 +12,18 @@ namespace CatalogoAPI.Controllers
     {
         private readonly IUnitOfWork _uow;
         private readonly ILogger _logger;
+        private readonly IMapper _mapper;
 
-        public CategoriasController(IUnitOfWork context, ILogger<CategoriasController> logger)
+        public CategoriasController(IUnitOfWork context, ILogger<CategoriasController> logger, IMapper mapper)
         {
             _uow = context;
             _logger = logger;
+            _mapper = mapper;
         }
 
 
         [HttpGet]
-        public ActionResult<IEnumerable<Categoria>> GetCategorias()
+        public ActionResult<IEnumerable<CategoriaDTO>> GetCategorias()
         {
             //throw new Exception();
 
@@ -31,12 +35,13 @@ namespace CatalogoAPI.Controllers
             var categorias = _uow.CategoriaRepository.Get().Take(10).ToList();
             if (categorias is null)
                 return NotFound("Categorias não encontradas...");
+            var categoriasDto = _mapper.Map<List<CategoriaDTO>>(categorias);
 
-            return Ok(categorias);
+            return Ok(categoriasDto);
         }
 
         [HttpGet("produtos")]
-        public ActionResult<IEnumerable<Categoria>> GetCategoriasProdutos()
+        public ActionResult<IEnumerable<CategoriaDTO>> GetCategoriasProdutos()
         {
             // Recomendado nunca retornar objetos relacionados sem um filtro,
             // aqui está usando Where para retornar somente os id menor ou igual a 10.
@@ -45,12 +50,14 @@ namespace CatalogoAPI.Controllers
             if (categorias is null)
                 return NotFound("Categorias não encontradas...");
 
-            return Ok(categorias);
+            var categoriasDto = _mapper.Map<List<CategoriaDTO>>(categorias);
+
+            return Ok(categoriasDto);
         }
 
         // Define que vai receber um id, e restringe a ser um inteiro.
         [HttpGet("{id:int}", Name = "ObterCategoria")]
-        public ActionResult<Categoria> GetCategoriasId(int id)
+        public ActionResult<CategoriaDTO> GetCategoriasId(int id)
         {
 
             var categoria = _uow.CategoriaRepository.GetById(c => c.CategoriaId == id);
@@ -62,15 +69,18 @@ namespace CatalogoAPI.Controllers
                 _logger.LogInformation($"========== GET api/categorias/id = {id} NOT FOUND =============");
                 return NotFound($"Categoria com id= {id} não localizada...");
             }
-            return Ok(categoria);
 
+            var categoriaDto = _mapper.Map<CategoriaDTO>(categoria);
+            return Ok(categoriaDto);
         }
 
         [HttpPost]
-        public ActionResult PostCategoria(Categoria categoria)
+        public ActionResult PostCategoria(CategoriaDTO categoriaDto)
         {
-            if (categoria is null)
+            if (categoriaDto is null)
                 return BadRequest();
+
+            var categoria = _mapper.Map<Categoria>(categoriaDto);
 
             _uow.CategoriaRepository.Add(categoria);
             _uow.Commit();
@@ -80,26 +90,28 @@ namespace CatalogoAPI.Controllers
             // necessário aqui já que não estamos dando nomes especificos
             // para as actions
             return new CreatedAtRouteResult("ObterCategoria",
-                new { id = categoria.CategoriaId }, categoria);
+                new { id = categoriaDto.CategoriaId }, categoriaDto);
         }
 
 
         // Put = Atualização COMPLETA do categoria (não permite parcial)
         [HttpPut("{id:int}")]
-        public ActionResult PutCategoria(int id, Categoria categoria)
+        public ActionResult PutCategoria(int id, CategoriaDTO categoriaDto)
         {
             // Quando enviar os dados do categoria tem que
             // informar o id do categoria também.
             // Então torna-se necessario conferir os id.
-            if (id != categoria.CategoriaId)
+            if (id != categoriaDto.CategoriaId)
             {
-                return BadRequest($"O id informado ({id}) não é o mesmo id recebido para atualização ({categoria.CategoriaId})");
+                return BadRequest($"O id informado ({id}) não é o mesmo id recebido para atualização ({categoriaDto.CategoriaId})");
             }
+
+            var categoria = _mapper.Map<Categoria>(categoriaDto);
 
             _uow.CategoriaRepository.Update(categoria);
             _uow.Commit();
 
-            return Ok(categoria);
+            return Ok(categoriaDto);
         }
 
         [HttpDelete("{id:int}")]
@@ -113,7 +125,9 @@ namespace CatalogoAPI.Controllers
             _uow.CategoriaRepository.Delete(categoria);
             _uow.Commit();
 
-            return Ok(categoria);
+            var categoriaDto = _mapper.Map<Categoria>(categoria);
+
+            return Ok(categoriaDto);
         }
 
         /*
