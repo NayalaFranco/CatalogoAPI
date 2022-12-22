@@ -40,7 +40,9 @@ namespace CatalogoAPI.Controllers
             {
                 return NotFound("Produtos não encontrados...");
             }
+            // Converte para lista de DTO
             var produtosDto = _mapper.Map<List<ProdutoDTO>>(produtos);
+            // Entrega o DTO
             return Ok(produtosDto);
         }
 
@@ -63,6 +65,7 @@ namespace CatalogoAPI.Controllers
             {
                 return NotFound($"Produto com id= {id} não localizado...");
             }
+            // Converte para DTO
             var produtoDto = _mapper.Map<ProdutoDTO>(produto);
             return Ok(produtoDto);
 
@@ -75,6 +78,7 @@ namespace CatalogoAPI.Controllers
                 return BadRequest();
 
             // Inverte o mapeamento aqui
+            // Converte ProdutoDTO para Produto
             var produto = _mapper.Map<Produto>(produtoDto);
 
             _uow.ProdutoRepository.Add(produto);
@@ -87,6 +91,7 @@ namespace CatalogoAPI.Controllers
             // necessário aqui já que não estamos dando nomes especificos
             // para as actions
             return new CreatedAtRouteResult("ObterProduto",
+                // Mas mostra produtoDto
                 new { id = produto.ProdutoId }, produtoDto);
 
         }
@@ -104,14 +109,21 @@ namespace CatalogoAPI.Controllers
                 return BadRequest($"O id informado ({id}) não é o mesmo id recebido para atualização ({produtoDto.ProdutoId})");
             }
 
-            var produto = _mapper.Map<Produto>(produtoDto);
+            // Verifica se esse produto a ser atualizado existe mesmo.
+            var produto = _uow.ProdutoRepository.GetById(p => p.ProdutoId == id);
+            if (produto is null)
+            {
+                return NotFound($"Produto com id= {id} não localizado...");
+            }
+
+            // Converte ProdutoDTO para Produto
+            produto = _mapper.Map<Produto>(produtoDto);
 
             _uow.ProdutoRepository.Update(produto);
             _uow.Commit();
 
+            // Mas mostra produtoDto
             return Ok(produtoDto);
-
-
         }
 
         [HttpDelete("{id:int}")]
@@ -125,8 +137,10 @@ namespace CatalogoAPI.Controllers
             _uow.ProdutoRepository.Delete(produto);
             _uow.Commit();
 
+            // Converte ProdutoDTO para Produto
             var produtoDto = _mapper.Map<ProdutoDTO>(produto);
 
+            // Mas mostra produtoDto
             return Ok(produtoDto);
         }
 

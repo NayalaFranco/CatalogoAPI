@@ -106,7 +106,14 @@ namespace CatalogoAPI.Controllers
                 return BadRequest($"O id informado ({id}) não é o mesmo id recebido para atualização ({categoriaDto.CategoriaId})");
             }
 
-            var categoria = _mapper.Map<Categoria>(categoriaDto);
+            // Confere se essa categoria existe mesmo na DB
+            var categoria = _uow.CategoriaRepository.GetById(p => p.CategoriaId == id);
+            if (categoria is null)
+            {
+                return NotFound($"Categoria com id= {id} não localizada...");
+            }
+
+            categoria = _mapper.Map<Categoria>(categoriaDto);
 
             _uow.CategoriaRepository.Update(categoria);
             _uow.Commit();
