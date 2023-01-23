@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
 using CatalogoAPI.DTOs;
 using CatalogoAPI.Filters;
+using CatalogoAPI.Pagination;
 using CatalogoAPI.Repository;
 using Microsoft.AspNetCore.Mvc;
 using Models;
+using System.Text.Json;
 
 namespace CatalogoAPI.Controllers
 {
@@ -32,14 +34,30 @@ namespace CatalogoAPI.Controllers
          * 3- E usando IEnumerable não precisa ter toda a coleção na memória.
          * Daria para usar List mas IEnumerable AQUI é mais otimizado.
          */
-        public ActionResult<IEnumerable<ProdutoDTO>> GetProdutos()
+        public ActionResult<IEnumerable<ProdutoDTO>> Get([FromQuery] ProdutosParameters produtosParameters)
         {
             // Agora com o padrão repository usa o ProdutoRepository.Get() para essa operação
-            var produtos = _uow.ProdutoRepository.Get().ToList();
+            var produtos = _uow.ProdutoRepository.GetProdutos(produtosParameters);
             if (produtos is null)
             {
                 return NotFound("Produtos não encontrados...");
             }
+
+            // Cria um metadata adicionar os dados de paginação no header do response
+            var metadata = new
+            {
+                produtos.TotalCount,
+                produtos.PageSize,
+                produtos.CurrentPage,
+                produtos.TotalPages,
+                produtos.HasNext,
+                produtos.HasPrevious
+            };
+
+            // Serializa em Json o metadata e adiciona no Header do Response.
+            Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(metadata));
+
+
             // Converte para lista de DTO
             var produtosDto = _mapper.Map<List<ProdutoDTO>>(produtos);
             // Entrega o DTO

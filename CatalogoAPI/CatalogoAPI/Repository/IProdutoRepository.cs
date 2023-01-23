@@ -1,4 +1,5 @@
-﻿using Models;
+﻿using CatalogoAPI.Pagination;
+using Models;
 
 namespace CatalogoAPI.Repository
 {
@@ -8,5 +9,6 @@ namespace CatalogoAPI.Repository
     public interface IProdutoRepository : IRepository<Produto>
     {
         IEnumerable<Produto> GetProdutosPorPreco();
+        PagedList<Produto> GetProdutos(ProdutosParameters produtosParameters);
     }
 }

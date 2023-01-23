@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using CatalogoAPI.DTOs;
+using CatalogoAPI.Pagination;
 using CatalogoAPI.Repository;
 using Microsoft.AspNetCore.Mvc;
 using Models;
+using System.Text.Json;
 
 namespace CatalogoAPI.Controllers
 {
@@ -23,18 +25,33 @@ namespace CatalogoAPI.Controllers
 
 
         [HttpGet]
-        public ActionResult<IEnumerable<CategoriaDTO>> GetCategorias()
+        public ActionResult<IEnumerable<CategoriaDTO>>
+            GetCategorias([FromQuery] CategoriasParameters categoriasParameters)
         {
             //throw new Exception();
 
             // isso será logado no console
             _logger.LogInformation("========== GET api/categorias =============");
 
-            // Take limita a quantidade de resultados para não sobrecarregar o sistema.
-            // esse get é o get do repositório
-            var categorias = _uow.CategoriaRepository.Get().Take(10).ToList();
+
+            var categorias = _uow.CategoriaRepository.GetCategorias(categoriasParameters);
             if (categorias is null)
                 return NotFound("Categorias não encontradas...");
+
+            // Cria um metadata adicionar os dados de paginação no header do response
+            var metadata = new
+            {
+                categorias.TotalCount,
+                categorias.PageSize,
+                categorias.CurrentPage,
+                categorias.TotalPages,
+                categorias.HasNext,
+                categorias.HasPrevious
+            };
+
+            // Serializa em Json o metadata e adiciona no Header do Response.
+            Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(metadata));
+
             var categoriasDto = _mapper.Map<List<CategoriaDTO>>(categorias);
 
             return Ok(categoriasDto);
