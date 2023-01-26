@@ -6,6 +6,6 @@
         IProdutoRepository ProdutoRepository { get; }
         ICategoriaRepository CategoriaRepository { get; }
         // Adiciona o commit
-        void Commit();
+        Task Commit();
     }
 }

@@ -1,5 +1,6 @@
 ﻿using CatalogoAPI.Context;
 using CatalogoAPI.Pagination;
+using Microsoft.EntityFrameworkCore;
 using Models;
 
 namespace CatalogoAPI.Repository
@@ -12,13 +13,13 @@ namespace CatalogoAPI.Repository
         {
         }
 
-        public IEnumerable<Produto> GetProdutosPorPreco()
+        public async Task<IEnumerable<Produto>> GetProdutosPorPreco()
         {
-            return Get().OrderBy(c => c.Preco).ToList();
+            return await Get().OrderBy(c => c.Preco).ToListAsync();
         }
 
         // Método de paginação
-        public PagedList<Produto> GetProdutos(ProdutosParameters produtosParameters)
+        public async Task<PagedList<Produto>> GetProdutos(ProdutosParameters produtosParameters)
         {
             /*
             return Get()
@@ -32,7 +33,7 @@ namespace CatalogoAPI.Repository
                 .ToList();
             */
 
-            return PagedList<Produto>.ToPagedList(Get().OrderBy(on => on.ProdutoId),
+            return await PagedList<Produto>.ToPagedList(Get().OrderBy(on => on.ProdutoId),
                 produtosParameters.PageNumber, produtosParameters.PageSize);
         }
     }

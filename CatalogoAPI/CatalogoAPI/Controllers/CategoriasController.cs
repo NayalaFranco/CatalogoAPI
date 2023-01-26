@@ -25,7 +25,7 @@ namespace CatalogoAPI.Controllers
 
 
         [HttpGet]
-        public ActionResult<IEnumerable<CategoriaDTO>>
+        public async Task<ActionResult<IEnumerable<CategoriaDTO>>>
             GetCategorias([FromQuery] CategoriasParameters categoriasParameters)
         {
             //throw new Exception();
@@ -33,8 +33,7 @@ namespace CatalogoAPI.Controllers
             // isso será logado no console
             _logger.LogInformation("========== GET api/categorias =============");
 
-
-            var categorias = _uow.CategoriaRepository.GetCategorias(categoriasParameters);
+            var categorias = await _uow.CategoriaRepository.GetCategorias(categoriasParameters);
             if (categorias is null)
                 return NotFound("Categorias não encontradas...");
 
@@ -58,14 +57,27 @@ namespace CatalogoAPI.Controllers
         }
 
         [HttpGet("produtos")]
-        public ActionResult<IEnumerable<CategoriaDTO>> GetCategoriasProdutos()
+        public async Task<ActionResult<IEnumerable<CategoriaDTO>>> 
+            GetCategoriasProdutos([FromQuery] CategoriasParameters categoriasParameters)
         {
-            // Recomendado nunca retornar objetos relacionados sem um filtro,
-            // aqui está usando Where para retornar somente os id menor ou igual a 10.
-            var categorias = _uow.CategoriaRepository.GetCategoriasProdutos()
-                .Where(c => c.CategoriaId <= 10).ToList();
+            
+            var categorias = await _uow.CategoriaRepository.GetCategoriasProdutos(categoriasParameters);
             if (categorias is null)
                 return NotFound("Categorias não encontradas...");
+
+            // Cria um metadata adicionar os dados de paginação no header do response
+            var metadata = new
+            {
+                categorias.TotalCount,
+                categorias.PageSize,
+                categorias.CurrentPage,
+                categorias.TotalPages,
+                categorias.HasNext,
+                categorias.HasPrevious
+            };
+
+            // Serializa em Json o metadata e adiciona no Header do Response.
+            Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(metadata));
 
             var categoriasDto = _mapper.Map<List<CategoriaDTO>>(categorias);
 
@@ -74,10 +86,10 @@ namespace CatalogoAPI.Controllers
 
         // Define que vai receber um id, e restringe a ser um inteiro.
         [HttpGet("{id:int}", Name = "ObterCategoria")]
-        public ActionResult<CategoriaDTO> GetCategoriasId(int id)
+        public async Task<ActionResult<CategoriaDTO>> GetCategoriasId(int id)
         {
 
-            var categoria = _uow.CategoriaRepository.GetById(c => c.CategoriaId == id);
+            var categoria = await _uow.CategoriaRepository.GetById(c => c.CategoriaId == id);
 
             _logger.LogInformation($"========== GET api/categorias/id = {id} =============");
 
@@ -92,7 +104,7 @@ namespace CatalogoAPI.Controllers
         }
 
         [HttpPost]
-        public ActionResult PostCategoria(CategoriaDTO categoriaDto)
+        public async Task<ActionResult> PostCategoria(CategoriaDTO categoriaDto)
         {
             if (categoriaDto is null)
                 return BadRequest();
@@ -100,7 +112,7 @@ namespace CatalogoAPI.Controllers
             var categoria = _mapper.Map<Categoria>(categoriaDto);
 
             _uow.CategoriaRepository.Add(categoria);
-            _uow.Commit();
+            await _uow.Commit();
 
             // Similar ao CreatedAtAction mas informa uma rota para o nome
             // definido na action get ao invés do nome da action,
@@ -113,7 +125,7 @@ namespace CatalogoAPI.Controllers
 
         // Put = Atualização COMPLETA do categoria (não permite parcial)
         [HttpPut("{id:int}")]
-        public ActionResult PutCategoria(int id, CategoriaDTO categoriaDto)
+        public async Task<ActionResult> PutCategoria(int id, CategoriaDTO categoriaDto)
         {
             // Quando enviar os dados do categoria tem que
             // informar o id do categoria também.
@@ -124,7 +136,7 @@ namespace CatalogoAPI.Controllers
             }
 
             // Confere se essa categoria existe mesmo na DB
-            var categoria = _uow.CategoriaRepository.GetById(p => p.CategoriaId == id);
+            var categoria = await _uow.CategoriaRepository.GetById(p => p.CategoriaId == id);
             if (categoria is null)
             {
                 return NotFound($"Categoria com id= {id} não localizada...");
@@ -133,21 +145,21 @@ namespace CatalogoAPI.Controllers
             categoria = _mapper.Map<Categoria>(categoriaDto);
 
             _uow.CategoriaRepository.Update(categoria);
-            _uow.Commit();
+            await _uow.Commit();
 
             return Ok(categoriaDto);
         }
 
         [HttpDelete("{id:int}")]
-        public ActionResult DeleteCategoria(int id)
+        public async Task<ActionResult> DeleteCategoria(int id)
         {
-            var categoria = _uow.CategoriaRepository.GetById(c => c.CategoriaId == id);
+            var categoria = await _uow.CategoriaRepository.GetById(c => c.CategoriaId == id);
 
             if (categoria is null)
                 return NotFound($"Categoria com id= {id} não localizada...");
 
             _uow.CategoriaRepository.Delete(categoria);
-            _uow.Commit();
+            await _uow.Commit();
 
             var categoriaDto = _mapper.Map<Categoria>(categoria);
 

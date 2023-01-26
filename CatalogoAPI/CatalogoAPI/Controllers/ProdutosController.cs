@@ -34,10 +34,10 @@ namespace CatalogoAPI.Controllers
          * 3- E usando IEnumerable não precisa ter toda a coleção na memória.
          * Daria para usar List mas IEnumerable AQUI é mais otimizado.
          */
-        public ActionResult<IEnumerable<ProdutoDTO>> Get([FromQuery] ProdutosParameters produtosParameters)
+        public async Task<ActionResult<IEnumerable<ProdutoDTO>>> Get([FromQuery] ProdutosParameters produtosParameters)
         {
             // Agora com o padrão repository usa o ProdutoRepository.Get() para essa operação
-            var produtos = _uow.ProdutoRepository.GetProdutos(produtosParameters);
+            var produtos = await _uow.ProdutoRepository.GetProdutos(produtosParameters);
             if (produtos is null)
             {
                 return NotFound("Produtos não encontrados...");
@@ -65,9 +65,9 @@ namespace CatalogoAPI.Controllers
         }
 
         [HttpGet("menorpreco")]
-        public ActionResult<IEnumerable<ProdutoDTO>> GetProdutosPrecos()
+        public async Task<ActionResult<IEnumerable<ProdutoDTO>>> GetProdutosPrecos()
         {
-            var produtos = _uow.ProdutoRepository.GetProdutosPorPreco().ToList();
+            var produtos = await _uow.ProdutoRepository.GetProdutosPorPreco();
             var produtosDto = _mapper.Map<List<ProdutoDTO>>(produtos);
 
             return produtosDto;
@@ -76,9 +76,9 @@ namespace CatalogoAPI.Controllers
 
         // Define que vai receber um id, e restringe a ser um inteiro.
         [HttpGet("{id:int}", Name = "ObterProduto")]
-        public ActionResult<ProdutoDTO> GetProdutoId(int id)
+        public async Task<ActionResult<ProdutoDTO>> GetProdutoId(int id)
         {
-            var produto = _uow.ProdutoRepository.GetById(p => p.ProdutoId == id);
+            var produto = await _uow.ProdutoRepository.GetById(p => p.ProdutoId == id);
             if (produto is null)
             {
                 return NotFound($"Produto com id= {id} não localizado...");
@@ -90,7 +90,7 @@ namespace CatalogoAPI.Controllers
         }
 
         [HttpPost]
-        public ActionResult PostProduto(ProdutoDTO produtoDto)
+        public async Task<ActionResult> PostProduto(ProdutoDTO produtoDto)
         {
             if (produtoDto is null)
                 return BadRequest();
@@ -100,7 +100,7 @@ namespace CatalogoAPI.Controllers
             var produto = _mapper.Map<Produto>(produtoDto);
 
             _uow.ProdutoRepository.Add(produto);
-            _uow.Commit();
+            await _uow.Commit();
 
             //produtoDto = _mapper.Map<ProdutoDTO>(produto);
 
@@ -117,7 +117,7 @@ namespace CatalogoAPI.Controllers
 
         // Put = Atualização COMPLETA do produto (não permite parcial)
         [HttpPut("{id:int}")]
-        public ActionResult PutProduto(int id, ProdutoDTO produtoDto)
+        public async Task<ActionResult> PutProduto(int id, ProdutoDTO produtoDto)
         {
             // Quando enviar os dados do produto tem que
             // informar o id do produto também.
@@ -128,7 +128,7 @@ namespace CatalogoAPI.Controllers
             }
 
             // Verifica se esse produto a ser atualizado existe mesmo.
-            var produto = _uow.ProdutoRepository.GetById(p => p.ProdutoId == id);
+            var produto = await _uow.ProdutoRepository.GetById(p => p.ProdutoId == id);
             if (produto is null)
             {
                 return NotFound($"Produto com id= {id} não localizado...");
@@ -138,22 +138,22 @@ namespace CatalogoAPI.Controllers
             produto = _mapper.Map<Produto>(produtoDto);
 
             _uow.ProdutoRepository.Update(produto);
-            _uow.Commit();
+            await _uow.Commit();
 
             // Mas mostra produtoDto
             return Ok(produtoDto);
         }
 
         [HttpDelete("{id:int}")]
-        public ActionResult DeleteProduto(int id)
+        public async Task<ActionResult> DeleteProduto(int id)
         { 
-            var produto = _uow.ProdutoRepository.GetById(p => p.ProdutoId == id);
+            var produto = await _uow.ProdutoRepository.GetById(p => p.ProdutoId == id);
 
             if (produto is null)
                 return NotFound($"Produto com id= {id} não localizado...");
 
             _uow.ProdutoRepository.Delete(produto);
-            _uow.Commit();
+            await _uow.Commit();
 
             // Converte ProdutoDTO para Produto
             var produtoDto = _mapper.Map<ProdutoDTO>(produto);

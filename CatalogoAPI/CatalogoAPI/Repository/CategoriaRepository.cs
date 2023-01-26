@@ -11,16 +11,19 @@ namespace CatalogoAPI.Repository
         {
         }
 
-        public PagedList<Categoria> GetCategorias(CategoriasParameters categoriasParameters)
+        public async Task<PagedList<Categoria>> GetCategorias(CategoriasParameters categoriasParameters)
         {
-            return PagedList<Categoria>.ToPagedList(Get().OrderBy(on => on.CategoriaId),
+            return await PagedList<Categoria>.ToPagedList(Get().OrderBy(on => on.CategoriaId),
                 categoriasParameters.PageNumber,
                 categoriasParameters.PageSize);
         }
 
-        public IEnumerable<Categoria> GetCategoriasProdutos()
+        public async Task<PagedList<Categoria>> GetCategoriasProdutos(CategoriasParameters categoriasParameters)
         {
-            return Get().Include(x => x.Produtos);
+            return await PagedList<Categoria>.ToPagedList(Get().OrderBy(on => on.CategoriaId).Include(x => x.Produtos),
+                categoriasParameters.PageNumber,
+                categoriasParameters.PageSize);
+                ;
         }
     }
 }
