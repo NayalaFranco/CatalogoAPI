@@ -35,7 +35,10 @@
         private void EscreverTextoNoArquivo(string mensagem)
         {
             // caminho onde vai salvar o log
-            string caminhoArquivoLog = @"c:\TestesLogs\CatalogoAPI_Log.txt";
+            // obs: curiosamente desta forma pega C:\Users\Daniel\Documents...
+            // que é a padrão, MAS, minha  pasta documents está setada para D:\
+            string caminhoArquivoLog = Environment
+                .ExpandEnvironmentVariables(@"%userprofile%\Documents\TestesLogs\CatalogoAPI_Log.txt");
 
             // Escopo instanciando o StreamWriter que estamos usando para escrever no arquivo de texto.
             using (StreamWriter streamWriter = new StreamWriter(caminhoArquivoLog, true))

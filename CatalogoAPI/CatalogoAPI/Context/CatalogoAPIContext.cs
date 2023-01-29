@@ -1,9 +1,10 @@
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Models;
 
 namespace CatalogoAPI.Context;
 
-public class CatalogoAPIContext : DbContext
+public class CatalogoAPIContext : IdentityDbContext
 {
     public CatalogoAPIContext(DbContextOptions<CatalogoAPIContext> options) : base(options)
     {

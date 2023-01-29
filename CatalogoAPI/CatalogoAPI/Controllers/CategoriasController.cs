@@ -2,6 +2,7 @@
 using CatalogoAPI.DTOs;
 using CatalogoAPI.Pagination;
 using CatalogoAPI.Repository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models;
 using System.Text.Json;
@@ -10,6 +11,8 @@ namespace CatalogoAPI.Controllers
 {
     [Route("[controller]")]
     [ApiController]
+    // Faz a controladora exigir autenticação do tipo bearer para os requests.
+    [Authorize(AuthenticationSchemes = "Bearer")]
     public class CategoriasController : ControllerBase
     {
         private readonly IUnitOfWork _uow;
