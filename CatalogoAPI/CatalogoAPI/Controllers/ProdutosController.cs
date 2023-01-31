@@ -28,7 +28,7 @@ namespace CatalogoAPI.Controllers
 
         [HttpGet]
         [ServiceFilter(typeof(ApiLoggingFilter))]
-        /* ActionResult retorna os metodos action como BadRequest e NotFound
+        /* ActionResult retorna os métodos action como BadRequest e NotFound
          * E também o tipo que ele estiver definido.
          * * * * * *
          * Porque usar IEnumerable aqui?
@@ -109,7 +109,7 @@ namespace CatalogoAPI.Controllers
 
             // Similar ao CreatedAtAction mas informa uma rota para o nome
             // definido na action get ao invés do nome da action,
-            // necessário aqui já que não estamos dando nomes especificos
+            // necessário aqui já que não estamos dando nomes específicos
             // para as actions
             return new CreatedAtRouteResult("ObterProduto",
                 // Mas mostra produtoDto
@@ -124,7 +124,7 @@ namespace CatalogoAPI.Controllers
         {
             // Quando enviar os dados do produto tem que
             // informar o id do produto também.
-            // Então torna-se necessario conferir os id.
+            // Então torna-se necessário conferir os id.
             if (id != produtoDto.ProdutoId)
             {
                 return BadRequest($"O id informado ({id}) não é o mesmo id recebido para atualização ({produtoDto.ProdutoId})");
@@ -177,7 +177,7 @@ namespace CatalogoAPI.Controllers
         /*
         [HttpGet]
         [ServiceFilter(typeof(ApiLoggingFilter))]
-        /* ActionResult retorna os metodos action como BadRequest e NotFound
+        /* ActionResult retorna os métodos action como BadRequest e NotFound
          * E também o tipo que ele estiver definido.
          * * * * * *
          * Porque usar IEnumerable aqui?
@@ -186,15 +186,15 @@ namespace CatalogoAPI.Controllers
          * 3- E usando IEnumerable não precisa ter toda a coleção na memória.
          * Daria para usar List mas IEnumerable AQUI é mais otimizado.
          * * * * * *
-         * async torna o metodo assíncrono, Task é necessario nesse cenario assíncrono
+         * async torna o método assíncrono, Task é necessário nesse cenário assíncrono
          */
         /*
         public async Task<ActionResult<IEnumerable<Produto>>> GetProdutosAsync()
         {
             // AsNoTracking melhora a performance mas só deve ser usado em Gets
             // Take limita a quantidade de resultados para não sobrecarregar o sistema.
-            // await aguarda a resposta do servidor em um metodo async,
-            // ToListAsync() é necessario em metodos async.
+            // await aguarda a resposta do servidor em um método async,
+            // ToListAsync() é necessário em métodos async.
             var produtos = await _context.Produtos.AsNoTracking().Take(10).ToListAsync();
             if (produtos is null)
             {
@@ -207,8 +207,8 @@ namespace CatalogoAPI.Controllers
         [HttpGet("{id:int}", Name = "ObterProduto")]
         public async Task<ActionResult<Produto>> GetProdutoIdAsync(int id)
         {
-            // First busca e retorna o primeiro resultado compativel, senao ele retorna uma excessão.
-            // FirstOrDefault retorna o primeiro resultado compativel, senao ele retorna um null.
+            // First busca e retorna o primeiro resultado compatível, senão ele retorna uma exceção.
+            // FirstOrDefault retorna o primeiro resultado compatível, senão ele retorna um null.
             var produto = await _context.Produtos.AsNoTracking().FirstOrDefaultAsync(p => p.ProdutoId == id);
             if (produto is null)
             {
@@ -224,7 +224,7 @@ namespace CatalogoAPI.Controllers
             if (produto is null)
                 return BadRequest();
 
-            // Como o context está na memoria não é necessario
+            // Como o context está na memoria não é necessário
             // que o Add seja AddAsync, apenas o SaveChanges 
             // pois é ele que vai salvar no banco de dados.
             _context.Produtos.Add(produto);
@@ -232,7 +232,7 @@ namespace CatalogoAPI.Controllers
 
             // Similar ao CreatedAtAction mas informa uma rota para o nome
             // definido na action get ao invés do nome da action,
-            // necessário aqui já que não estamos dando nomes especificos
+            // necessário aqui já que não estamos dando nomes específicos
             // para as actions
             return new CreatedAtRouteResult("ObterProduto",
                 new { id = produto.ProdutoId }, produto);
@@ -246,16 +246,16 @@ namespace CatalogoAPI.Controllers
         {
             // Quando enviar os dados do produto tem que
             // informar o id do produto também.
-            // Então torna-se necessario conferir os id.
+            // Então torna-se necessário conferir os id.
             if (id != produto.ProdutoId)
             {
                 return BadRequest($"O id informado ({id}) não é o mesmo id recebido para atualização ({produto.ProdutoId})");
             }
 
-            // Como estamos trabalhando em um cenario "desconectado"
-            // (os dados estão dentro da variavel _context)
+            // Como estamos trabalhando em um cenário "desconectado"
+            // (os dados estão dentro da variável _context)
             // o contexto precisa ser informado que produto está em um
-            // estado modificado. Para isso usamos o metodo Entry do contexto.
+            // estado modificado. Para isso usamos o método Entry do contexto.
             _context.Entry(produto).State = EntityState.Modified;
             await _context.SaveChangesAsync();
 

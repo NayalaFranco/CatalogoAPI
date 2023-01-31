@@ -5,8 +5,8 @@ using Models;
 
 namespace CatalogoAPI.Repository
 {
-    // a classe de repositorio especifica implementa
-    // a interface especifica e herda o repositorio genérico
+    // a classe de repositório especifica implementa
+    // a interface especifica e herda o repositório genérico
     public class ProdutoRepository : Repository<Produto>, IProdutoRepository
     {
         public ProdutoRepository(CatalogoAPIContext context) : base(context)

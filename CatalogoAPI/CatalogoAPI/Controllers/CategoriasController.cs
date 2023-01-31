@@ -119,7 +119,7 @@ namespace CatalogoAPI.Controllers
 
             // Similar ao CreatedAtAction mas informa uma rota para o nome
             // definido na action get ao invés do nome da action,
-            // necessário aqui já que não estamos dando nomes especificos
+            // necessário aqui já que não estamos dando nomes específicos
             // para as actions
             return new CreatedAtRouteResult("ObterCategoria",
                 new { id = categoriaDto.CategoriaId }, categoriaDto);
@@ -132,7 +132,7 @@ namespace CatalogoAPI.Controllers
         {
             // Quando enviar os dados do categoria tem que
             // informar o id do categoria também.
-            // Então torna-se necessario conferir os id.
+            // Então torna-se necessário conferir os id.
             if (id != categoriaDto.CategoriaId)
             {
                 return BadRequest($"O id informado ({id}) não é o mesmo id recebido para atualização ({categoriaDto.CategoriaId})");
@@ -207,8 +207,8 @@ namespace CatalogoAPI.Controllers
         [HttpGet("{id:int}", Name = "ObterCategoria")]
         public async Task<ActionResult<Categoria>> GetCategoriasIdAsync(int id)
         {
-            // First busca e retorna o primeiro resultado compativel, senao ele retorna uma excessão.
-            // FirstOrDefault retorna o primeiro resultado compativel, senao ele retorna um null.
+            // First busca e retorna o primeiro resultado compatível, senão ele retorna uma exceção.
+            // FirstOrDefault retorna o primeiro resultado compatível, senão ele retorna um null.
             var categoria = await _context.Categorias.AsNoTracking().FirstOrDefaultAsync(c => c.CategoriaId == id);
 
             _logger.LogInformation($"========== GET api/categorias/id = {id} =============");
@@ -233,7 +233,7 @@ namespace CatalogoAPI.Controllers
 
             // Similar ao CreatedAtAction mas informa uma rota para o nome
             // definido na action get ao invés do nome da action,
-            // necessário aqui já que não estamos dando nomes especificos
+            // necessário aqui já que não estamos dando nomes específicos
             // para as actions
             return new CreatedAtRouteResult("ObterCategoria",
                 new { id = categoria.CategoriaId }, categoria);
@@ -246,16 +246,16 @@ namespace CatalogoAPI.Controllers
         {
             // Quando enviar os dados do categoria tem que
             // informar o id do categoria também.
-            // Então torna-se necessario conferir os id.
+            // Então torna-se necessário conferir os id.
             if (id != categoria.CategoriaId)
             {
                 return BadRequest($"O id informado ({id}) não é o mesmo id recebido para atualização ({categoria.CategoriaId})");
             }
 
-            // Como estamos trabalhando em um cenario "desconectado"
-            // (os dados estão dentro da variavel _context)
+            // Como estamos trabalhando em um cenário "desconectado"
+            // (os dados estão dentro da variável _context)
             // o contexto precisa ser informado que categoria está em um
-            // estado modificado. Para isso usamos o metodo Entry do contexto.
+            // estado modificado. Para isso usamos o método Entry do contexto.
             _context.Entry(categoria).State = EntityState.Modified;
             await _context.SaveChangesAsync();
 

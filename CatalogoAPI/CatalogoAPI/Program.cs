@@ -17,13 +17,13 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-// Registrando o serviÁo de filtro
+// Registrando o servi√ßo de filtro
 builder.Services.AddScoped<ApiLoggingFilter>();
 
-// Registrando o serviÁo da Unit of Work
+// Registrando o servi√ßo da Unit of Work
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-// Registrando o serviÁo do AutoMapper
+// Registrando o servi√ßo do AutoMapper
 var mappingConfig = new MapperConfiguration(mc =>
 {
     mc.AddProfile(new MappingProfile());
@@ -35,24 +35,24 @@ builder.Services.AddSingleton(mapper);
 builder.Services.AddDbContext<CatalogoAPIContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// IdentityUser È o usu·rio do identity, e o 
-// IdentityRole trata perfis de usu·rio.
+// IdentityUser √© o usu√°rio do identity, e o 
+// IdentityRole trata perfis de usu√°rio.
 builder.Services.AddIdentity<IdentityUser, IdentityRole>()
-// O AddEntityFrameworkStores adiciona uma implementaÁ„o
+// O AddEntityFrameworkStores adiciona uma implementa√ß√£o
 // do entity framework core do Identity para o
-// context que È o AppDbContext
+// context que √© o AppDbContext
         .AddEntityFrameworkStores<CatalogoAPIContext>()
 // O AddDefaultTokenProviders ele permite gerar tokens
-// ALEAT”RIOS para quando houver mudanÁa de email,
+// ALEAT√ìRIOS para quando houver mudan√ßa de email,
 // precisar resetar uma senha, altera telefone, e para
-// gerar uma autenticaÁ„o de de duas etapas.
-// (Esse n„o tem a ver com o JWT que estamos implementando)
+// gerar uma autentica√ß√£o de de duas etapas.
+// (Esse n√£o tem a ver com o JWT que estamos implementando)
         .AddDefaultTokenProviders();
 
 // JWT
-// Adiciona o manipulador de autenticaÁ„o e define o
-// esquema de autenticaÁ„o usado : Bearer
-// valida o emissor, a audiencia e a chave
+// Adiciona o manipulador de autentica√ß√£o e define o
+// esquema de autentica√ß√£o usado : Bearer
+// valida o emissor, a audi√™ncia e a chave
 // usando a chave secreta valida a assinatura
 builder.Services.AddAuthentication(
     JwtBearerDefaults.AuthenticationScheme)
@@ -70,9 +70,9 @@ builder.Services.AddAuthentication(
         });
 
 builder.Services.AddControllers()
-    // Adicional para resolver o problema da referencia ciclica
+    // Adicional para resolver o problema da referencia c√≠clica
     // onde categoria referencia produto, e produto referencia categoria
-    // e a serializaÁ„o entra num loop de referencia.
+    // e a serializa√ß√£o entra num loop de referencia.
     .AddJsonOptions(options =>
         options.JsonSerializerOptions
             .ReferenceHandler = ReferenceHandler.IgnoreCycles);
@@ -83,7 +83,7 @@ builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "CatalogoAPI", Version = "v1" });
 
-    // informa o tipo de seguranÁa usado e uma descriÁ„o de
+    // Informa o tipo de seguran√ßa usado e uma descri√ß√£o de
     // como inserir ela na janelinha que isso vai criar no swagger
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
     {
@@ -92,12 +92,12 @@ builder.Services.AddSwaggerGen(c =>
         Scheme = "Bearer",
         BearerFormat = "JWT",
         In = ParameterLocation.Header,
-        Description = "Header de autoriaÁ„o JWT usando o esquema Bearer." +
-        "\r\n\r\nInforme 'Bearer'[espaÁo] e o seu token." +
-        "\r\n\r\nExamplo: \'Bearer 12345abcdef\'",
+        Description = "Header de autoriza√ß√£o JWT usando o esquema Bearer." +
+        "\r\n\r\nInforme 'Bearer'[espa√ßo] e o seu token." +
+        "\r\n\r\nExemplo: \'Bearer 12345abcdef\'",
     });
 
-    // Informa o tipo de seguranÁa requerido
+    // Informa o tipo de seguran√ßa requerido
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
@@ -115,10 +115,10 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 // Ativando o logging
-// adiciona o provider e sua configuraÁ„o
+// adiciona o provider e sua configura√ß√£o
 builder.Logging.AddProvider(new CustomLoggerProvider(new CustomLoggerProviderConfiguration
 {
-    // atribui o nivel de log para information
+    // atribui o n√≠vel de log para information
     LogLevel = LogLevel.Information
 }));
 
@@ -131,7 +131,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-// Chamando a extens„o do middleware
+// Chamando a extens√£o do middleware
 app.ConfigureExceptionHandler();
 
 app.UseHttpsRedirection();

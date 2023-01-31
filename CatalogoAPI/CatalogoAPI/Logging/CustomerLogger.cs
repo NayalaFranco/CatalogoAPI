@@ -22,7 +22,7 @@
             return logLevel == loggerConfig.LogLevel;
         }
 
-        // Método da propria interface que o sistema irá executar com nosso código
+        // Método da própria interface que o sistema irá executar com nosso código
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state,
             Exception exception, Func<TState, Exception, string> formatter)
         {

@@ -39,7 +39,7 @@ namespace CatalogoAPI.Controllers
         [HttpPost("register")]
         public async Task<ActionResult> RegisterUser([FromBody] UsuarioDTO model)
         {   
-            // Cria uma instancia do usuario do Identity e
+            // Cria uma instancia do usuário do Identity e
             // insere os dados que estão vindo no corpo do request [FromBody]
             var user = new IdentityUser
             {
@@ -68,7 +68,7 @@ namespace CatalogoAPI.Controllers
         [HttpPost("login")]
         public async Task<ActionResult> Login([FromBody] UsuarioDTO userInfo)
         {
-            // Verfica as credenciais do usuário e retorna um valor
+            // Verifica as credenciais do usuário e retorna um valor
             var result = await _signInManager.PasswordSignInAsync(userInfo.Email,
                 // o lockoutOnFailure é para bloquear se tentar mais de 3x
                 userInfo.Password, isPersistent: false, lockoutOnFailure: false);
@@ -87,7 +87,7 @@ namespace CatalogoAPI.Controllers
         private UsuarioToken GeraToken(UsuarioDTO userInfo)
         {
             // Define declarações do usuário
-            // Não é obrigatorio mas aumenta a segurança
+            // Não é obrigatório mas aumenta a segurança
             // Isso seria como informações adicionais que os registros
             // pedem para fazer ao criar a conta, mas está sendo definido
             // diretamente aqui para simplificar
@@ -121,8 +121,8 @@ namespace CatalogoAPI.Controllers
             var expiracao = _configuration["TokenConfiguration:ExpireHours"];
             
             // Aqui convertemos o valor para o formato UTC
-            // isso é importante porque se o usuario usar um formato
-            // diferente de hora/fuso horario, não vai dar problema.
+            // isso é importante porque se o usuário usar um formato
+            // diferente de hora/fuso horário, não vai dar problema.
             var expiration = DateTime.UtcNow.AddHours(double.Parse(expiracao));
 
             // Classe que representa um token JWT e gera o token

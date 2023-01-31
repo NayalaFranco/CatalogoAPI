@@ -1,11 +1,10 @@
 using CatalogoAPI.Validations;
-using Microsoft.OpenApi.Validations;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
 namespace Models;
-// IValidatableObject serve para criar validação de propriedades a nivel de Model
+// IValidatableObject serve para criar validação de propriedades a nível de Model
 public class Produto : IValidatableObject
 {
     // ao colocar uma propriedade int com o nome de Id
@@ -45,7 +44,7 @@ public class Produto : IValidatableObject
     public Categoria? Categoria { get; set; }
 
 
-    // Sistema de validação a nivel de Model
+    // Sistema de validação a nível de Model
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
         //if (!string.IsNullOrEmpty(this.Nome))
@@ -54,7 +53,7 @@ public class Produto : IValidatableObject
         //    if (primeiraLetra != primeiraLetra.ToUpper())
         //    {
         //        yield return new
-        //          ValidationResult("Aprimeira letra do produto deve ser maiúscula",
+        //          ValidationResult("A primeira letra do produto deve ser maiúscula",
         //          new[]
         //          { nameof(this.Nome) }
         //          );

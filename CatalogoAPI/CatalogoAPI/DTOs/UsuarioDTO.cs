@@ -5,9 +5,9 @@ namespace CatalogoAPI.DTOs
 {
     public class UsuarioDTO
     {
-        // Essas DataAnnotations não são necessarias,
+        // Essas DataAnnotations não são necessárias,
         // o Identity ja faz a filtragem os dados inseridos,
-        // eu coloquei apenas para deixar em portugues os erros.
+        // eu coloquei apenas para deixar em português os erros.
         [Required(ErrorMessage = "Email é requerido")]
         [EmailAddress(ErrorMessage = "Formato de email inválido")]
         public string Email { get; set; }
