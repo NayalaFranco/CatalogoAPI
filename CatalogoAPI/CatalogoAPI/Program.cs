@@ -15,6 +15,22 @@ using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Seguindo a documentação do net 6 sobre CORS
+var NomeDaPoliticaCors = "NomeQualquerDaPoliticaCors";
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: NomeDaPoliticaCors,
+                        policy =>
+                        {
+                            policy.WithOrigins("https://www.apirequest.io",
+                                "https://apirequest.io")
+                                .AllowAnyMethod()
+                                .AllowAnyHeader();
+                        }
+                      );
+});
+
 // Add services to the container.
 
 // Registrando o serviço de filtro
@@ -135,6 +151,10 @@ if (app.Environment.IsDevelopment())
 app.ConfigureExceptionHandler();
 
 app.UseHttpsRedirection();
+
+app.UseRouting();
+
+app.UseCors(NomeDaPoliticaCors);
 
 app.UseAuthorization();
 
