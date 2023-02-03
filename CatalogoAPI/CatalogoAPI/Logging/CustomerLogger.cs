@@ -1,4 +1,6 @@
-﻿namespace CatalogoAPI.Logging
+﻿using System.IO;
+
+namespace CatalogoAPI.Logging
 {
     // Implementa a interface ILogger
     public class CustomerLogger : ILogger
@@ -32,27 +34,37 @@
             EscreverTextoNoArquivo(mensagem);
         }
 
+
         private void EscreverTextoNoArquivo(string mensagem)
         {
             // caminho onde vai salvar o log
             // obs: curiosamente desta forma pega C:\Users\Daniel\Documents...
             // que é a padrão, MAS, minha  pasta documents está setada para D:\
             string caminhoArquivoLog = Environment
-                .ExpandEnvironmentVariables(@"%userprofile%\Documents\TestesLogs\CatalogoAPI_Log.txt");
+                .ExpandEnvironmentVariables(@"%userprofile%\Documents\TestesLogs\");
 
-            // Escopo instanciando o StreamWriter que estamos usando para escrever no arquivo de texto.
-            using (StreamWriter streamWriter = new StreamWriter(caminhoArquivoLog, true))
+            string nomeArquivoLog = "CatalogoAPI_Log.txt";
+
+
+            try
             {
-                try
+                // Cria o diretorio quando não existe e para de dar erro
+                if (!Directory.Exists(caminhoArquivoLog))
+                {
+                    Directory.CreateDirectory(caminhoArquivoLog);
+                }
+
+                // Escopo instanciando o StreamWriter que estamos usando para escrever no arquivo de texto.
+                using (StreamWriter streamWriter = new StreamWriter(caminhoArquivoLog + nomeArquivoLog, true))
                 {
                     // Escreve mensagem no arquivo de texto.
                     streamWriter.WriteLine(mensagem);
                     streamWriter.Close();
                 }
-                catch (Exception)
-                {
-                    throw;
-                }
+            }
+            catch (Exception)
+            {
+                throw;
             }
         }
     }
