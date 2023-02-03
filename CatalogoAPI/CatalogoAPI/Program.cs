@@ -7,6 +7,8 @@ using CatalogoAPI.Logging;
 using CatalogoAPI.Repository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -137,6 +139,28 @@ builder.Logging.AddProvider(new CustomLoggerProvider(new CustomLoggerProviderCon
     // atribui o nível de log para information
     LogLevel = LogLevel.Information
 }));
+
+builder.Services.AddApiVersioning(options =>
+{
+    // Se a versão não for especificada ele carrega a versão padrão especificada
+    options.AssumeDefaultVersionWhenUnspecified = true;
+
+    // Especifica qual é a versão padrão
+    options.DefaultApiVersion = new ApiVersion(1, 0);
+
+    // Diz no header a versão (da para ver pelo Postman)
+    options.ReportApiVersions = true;
+
+    // Lê a versão da API requisitada pelo reader através do campo nomeado de api-version
+    options.ApiVersionReader = new HeaderApiVersionReader("api-version");
+});
+
+// Corrige o problema do Swagger que ocorre ao adicionar versionamento nas APIs
+builder.Services.AddVersionedApiExplorer(options =>
+{
+    options.GroupNameFormat = "'v'VVV";
+    //options.SubstituteApiVersionInUrl = true;
+});
 
 var app = builder.Build();
 
