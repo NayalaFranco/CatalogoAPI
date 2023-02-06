@@ -26,7 +26,11 @@ namespace CatalogoAPI.Controllers
             _mapper = mapper;
         }
 
-
+        /// <summary>
+        /// Obtem as categorias.
+        /// </summary>
+        /// <param name="categoriasParameters">Objeto com os dados de paginação</param>
+        /// <returns>Retorna uma lista de categorias</returns>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<CategoriaDTO>>>
             GetCategorias([FromQuery] CategoriasParameters categoriasParameters)
@@ -59,6 +63,11 @@ namespace CatalogoAPI.Controllers
             return Ok(categoriasDto);
         }
 
+        /// <summary>
+        /// Obtem uma lista de categorias com os produtos contidos nelas.
+        /// </summary>
+        /// <param name="categoriasParameters">Objeto com os dados de paginação</param>
+        /// <returns>Retorna uma lista de categorias com os produtos</returns>
         [HttpGet("produtos")]
         public async Task<ActionResult<IEnumerable<CategoriaDTO>>> 
             GetCategoriasProdutos([FromQuery] CategoriasParameters categoriasParameters)
@@ -87,6 +96,11 @@ namespace CatalogoAPI.Controllers
             return Ok(categoriasDto);
         }
 
+        /// <summary>
+        /// Obtem uma unica categoria pelo seu ID
+        /// </summary>
+        /// <param name="id">ID da categoria</param>
+        /// <returns>Retorna o objeto categoria de mesmo ID</returns>
         // Define que vai receber um id, e restringe a ser um inteiro.
         [HttpGet("{id:int}", Name = "ObterCategoria")]
         public async Task<ActionResult<CategoriaDTO>> GetCategoriasId(int id)
@@ -106,6 +120,22 @@ namespace CatalogoAPI.Controllers
             return Ok(categoriaDto);
         }
 
+        /// <summary>
+        /// Regista uma nova categoria
+        /// </summary>
+        /// <remarks>
+        /// Exemplo de request:
+        ///     POST: Categorias
+        ///     
+        ///     {
+        ///         "categoriaId": 1,
+        ///         "nome": "categoria1",
+        ///         "imagemUrl": "http://teste.net/1.jpg"
+        ///     }     
+        /// </remarks>
+        /// <param name="categoriaDto">Objeto Categoria</param>
+        /// <returns>O objeto categoria criado</returns>
+        /// <remarks>Retorna o objeto categoria que foi criado</remarks>
         [HttpPost]
         public async Task<ActionResult> PostCategoria(CategoriaDTO categoriaDto)
         {
@@ -126,6 +156,22 @@ namespace CatalogoAPI.Controllers
         }
 
 
+
+        /// <summary>
+        /// Atualiza os dados de uma categoria
+        /// </summary>
+        /// <remarks>
+        /// Exemplo de request:
+        ///     PUT: Categorias/1
+        ///     
+        ///     {
+        ///         "categoriaId": 1,
+        ///         "nome": "categoria1",
+        ///         "imagemUrl": "http://teste.net/1.jpg"
+        ///     }     
+        /// </remarks>
+        /// <param name="categoriaDto">Objeto Categoria</param>
+        /// <returns>Retorna a categoria atualizada</returns>
         // Put = Atualização COMPLETA do categoria (não permite parcial)
         [HttpPut("{id:int}")]
         public async Task<ActionResult> PutCategoria(int id, CategoriaDTO categoriaDto)
@@ -153,6 +199,12 @@ namespace CatalogoAPI.Controllers
             return Ok(categoriaDto);
         }
 
+
+        /// <summary>
+        /// Deleta a categoria de mesmo ID
+        /// </summary>
+        /// <param name="id">Identificação da categoria</param>
+        /// <returns>Confirmação e a categoria deletada</returns>
         [HttpDelete("{id:int}")]
         public async Task<ActionResult> DeleteCategoria(int id)
         {

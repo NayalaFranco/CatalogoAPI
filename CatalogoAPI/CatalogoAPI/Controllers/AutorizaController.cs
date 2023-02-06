@@ -29,13 +29,30 @@ namespace CatalogoAPI.Controllers
         }
 
 
-        // Get apenas para verificar se a API está atendendo.
+        /// <summary>
+        /// Verifica se a API está atendendo
+        /// </summary>
         [HttpGet]
         public ActionResult<string> Get()
         {
             return $"AutorizaController :: Acessado em : {DateTime.Now.ToLongDateString()}";
         }
 
+        /// <summary>
+        /// Registro de Usuário
+        /// </summary>
+        /// <param name="model">Objeto UsuarioDTO</param>
+        /// <remarks>
+        /// Exemplo de request:
+        ///     POST: api/Autoriza/register
+        ///     
+        ///     {
+        ///         "email": "email@email.com",
+        ///         "password": "S3nh@F0rte",
+        ///         "confirmaPassword": "S3nh@F0rte"
+        ///     }     
+        /// </remarks>
+        /// <returns>Retorna a confirmação ou falha do cadastro</returns>
         [HttpPost("register")]
         public async Task<ActionResult> RegisterUser([FromBody] UsuarioDTO model)
         {   
@@ -65,6 +82,21 @@ namespace CatalogoAPI.Controllers
             return Ok();
         }
 
+        /// <summary>
+        /// Login de Usuário
+        /// </summary>
+        /// <param name="model">Objeto UsuarioDTO</param>
+        /// <remarks>
+        /// Exemplo de request:
+        ///     POST: api/Autoriza/login
+        ///     
+        ///     {
+        ///         "email": "email@email.com",
+        ///         "password": "S3nh@F0rte",
+        ///         "confirmaPassword": "S3nh@F0rte"
+        ///     }     
+        /// </remarks>
+        /// <returns>Status 200 OK e retorna o token JWT</returns>
         [HttpPost("login")]
         public async Task<ActionResult> Login([FromBody] UsuarioDTO userInfo)
         {
@@ -84,6 +116,11 @@ namespace CatalogoAPI.Controllers
             }
         }
 
+        /// <summary>
+        /// Gera o token JWT
+        /// </summary>
+        /// <param name="userInfo">Objeto UsuarioDTO</param>
+        /// <returns>Retorna o token JWT</returns>
         private UsuarioToken GeraToken(UsuarioDTO userInfo)
         {
             // Define declarações do usuário

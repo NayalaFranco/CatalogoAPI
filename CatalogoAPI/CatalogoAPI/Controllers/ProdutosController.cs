@@ -26,6 +26,12 @@ namespace CatalogoAPI.Controllers
             _mapper = mapper;
         }
 
+
+        /// <summary>
+        /// Obtem os produtos
+        /// </summary>
+        /// <param name="produtosParameters">Objeto com os dados de paginação</param>
+        /// <returns>Lista de produtos</returns>
         [HttpGet]
         [ServiceFilter(typeof(ApiLoggingFilter))]
         /* ActionResult retorna os métodos action como BadRequest e NotFound
@@ -67,6 +73,10 @@ namespace CatalogoAPI.Controllers
             return Ok(produtosDto);
         }
 
+        /// <summary>
+        /// Obtem os produtos ordenados pelo menor preço
+        /// </summary>
+        /// <returns>Lista de produtos</returns>
         [HttpGet("menorpreco")]
         public async Task<ActionResult<IEnumerable<ProdutoDTO>>> GetProdutosPrecos()
         {
@@ -77,6 +87,11 @@ namespace CatalogoAPI.Controllers
 
         }
 
+        /// <summary>
+        /// Obtem um produto pelo seu ID
+        /// </summary>
+        /// <param name="id">Número de identificação do produto</param>
+        /// <returns>Retorna um objeto produto</returns>
         // Define que vai receber um id, e restringe a ser um inteiro.
         [HttpGet("{id:int}", Name = "ObterProduto")]
         public async Task<ActionResult<ProdutoDTO>> GetProdutoId(int id)
@@ -92,6 +107,24 @@ namespace CatalogoAPI.Controllers
 
         }
 
+        /// <summary>
+        /// Cria um novo produto
+        /// </summary>
+        /// <remarks>
+        /// Exemplo de request:
+        ///     POST: Produtos
+        ///     
+        ///     {
+        ///         "produtoId": 1,
+        ///         "nome": "produto1",
+        ///         "descricao": "um produto muito bom",
+        ///         "preco": 12.34,
+        ///         "imagemUrl": "http://teste.net/1.jpg",
+        ///         "categoriaID: 1
+        ///     }   
+        /// </remarks>
+        /// <param name="produtoDto">Objeto ProdutoDTO</param>
+        /// <returns>Retorna o objeto do produto criado</returns>
         [HttpPost]
         public async Task<ActionResult> PostProduto(ProdutoDTO produtoDto)
         {
@@ -117,7 +150,24 @@ namespace CatalogoAPI.Controllers
 
         }
 
-
+        /// <summary>
+        /// Atualiza os dados de um produto
+        /// </summary>
+        /// <remarks>
+        /// Exemplo de request:
+        ///     PUT: Produtos/1
+        ///     
+        ///     {
+        ///         "produtoId": 1,
+        ///         "nome": "produto1",
+        ///         "descricao": "um produto muito bom",
+        ///         "preco": 12.34,
+        ///         "imagemUrl": "http://teste.net/1.jpg",
+        ///         "categoriaID: 1
+        ///     }   
+        /// </remarks>
+        /// <param name="produtoDto">Objeto ProdutoDTO</param>
+        /// <returns>Confirma o sucesso e retorna o objeto do produto atualizado</returns>
         // Put = Atualização COMPLETA do produto (não permite parcial)
         [HttpPut("{id:int}")]
         public async Task<ActionResult> PutProduto(int id, ProdutoDTO produtoDto)
@@ -147,6 +197,11 @@ namespace CatalogoAPI.Controllers
             return Ok(produtoDto);
         }
 
+        /// <summary>
+        /// Deleta um produto
+        /// </summary>
+        /// <param name="id">Código do produto</param>
+        /// <returns>Confirma o sucesso e retorna o objeto do produto deletado</returns>
         [HttpDelete("{id:int}")]
         public async Task<ActionResult> DeleteProduto(int id)
         { 

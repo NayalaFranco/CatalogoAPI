@@ -7,6 +7,10 @@ namespace CatalogoAPI.Controllers
     [ApiController]
     public class TesteVersionV1Controller : ControllerBase
     {
+        /// <summary>
+        /// Teste Action Versão 1
+        /// </summary>
+        /// <returns>Texto</returns>
         [HttpGet]
         public IActionResult Get()
         {
