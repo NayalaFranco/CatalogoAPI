@@ -8,6 +8,13 @@ using System.Text;
 
 namespace CatalogoAPI.Controllers
 {
+    // Esse Produces indica que as saidas de objetos serão no formato JSON
+    // seu oposto é o Consumes que indica que a API só aceita entradas no formato JSON
+    // qualquer outro formato produz um erro: "415 - Unsupported Media Type".
+    // Neste momento estamos usando apenas para deixar os gets do swagger sempre
+    // com a opção de mostrar no formato application/json selecionada.
+    [Produces("application/json")]
+
     [Route("api/[controller]")]
     [ApiController]
     public class AutorizaController : ControllerBase
@@ -85,7 +92,7 @@ namespace CatalogoAPI.Controllers
         /// <summary>
         /// Login de Usuário
         /// </summary>
-        /// <param name="model">Objeto UsuarioDTO</param>
+        /// <param name="userInfo">Objeto UsuarioDTO</param>
         /// <remarks>
         /// Exemplo de request:
         ///     POST: api/Autoriza/login
