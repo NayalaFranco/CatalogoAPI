@@ -39,6 +39,9 @@ namespace CatalogoAPI.Controllers
         /// <param name="categoriasParameters">Objeto com os dados de paginação</param>
         /// <returns>Retorna uma lista de categorias</returns>
         [HttpGet]
+        [ProducesResponseType(typeof(CategoriaDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+        [ProducesDefaultResponseType]
         public async Task<ActionResult<IEnumerable<CategoriaDTO>>>
             GetCategorias([FromQuery] CategoriasParameters categoriasParameters)
         {
@@ -76,6 +79,9 @@ namespace CatalogoAPI.Controllers
         /// <param name="categoriasParameters">Objeto com os dados de paginação</param>
         /// <returns>Retorna uma lista de categorias com os produtos</returns>
         [HttpGet("produtos")]
+        [ProducesResponseType(typeof(CategoriaDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+        [ProducesDefaultResponseType]
         public async Task<ActionResult<IEnumerable<CategoriaDTO>>> 
             GetCategoriasProdutos([FromQuery] CategoriasParameters categoriasParameters)
         {
@@ -110,6 +116,9 @@ namespace CatalogoAPI.Controllers
         /// <returns>Retorna o objeto categoria de mesmo ID</returns>
         // Define que vai receber um id, e restringe a ser um inteiro.
         [HttpGet("{id:int}", Name = "ObterCategoria")]
+        [ProducesResponseType(typeof(CategoriaDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+        [ProducesDefaultResponseType]
         public async Task<ActionResult<CategoriaDTO>> GetCategoriasId(int id)
         {
 
@@ -144,6 +153,9 @@ namespace CatalogoAPI.Controllers
         /// <returns>O objeto categoria criado</returns>
         /// <remarks>Retorna o objeto categoria que foi criado</remarks>
         [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesDefaultResponseType]
         public async Task<ActionResult> PostCategoria(CategoriaDTO categoriaDto)
         {
             if (categoriaDto is null)
@@ -182,6 +194,10 @@ namespace CatalogoAPI.Controllers
         /// <returns>Retorna a categoria atualizada</returns>
         // Put = Atualização COMPLETA do categoria (não permite parcial)
         [HttpPut("{id:int}")]
+        [ProducesResponseType(typeof(CategoriaDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+        [ProducesDefaultResponseType]
         public async Task<ActionResult> PutCategoria(int id, CategoriaDTO categoriaDto)
         {
             // Quando enviar os dados do categoria tem que
@@ -214,6 +230,9 @@ namespace CatalogoAPI.Controllers
         /// <param name="id">Identificação da categoria</param>
         /// <returns>Confirmação e a categoria deletada</returns>
         [HttpDelete("{id:int}")]
+        [ProducesResponseType(typeof(CategoriaDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+        [ProducesDefaultResponseType]
         public async Task<ActionResult> DeleteCategoria(int id)
         {
             var categoria = await _uow.CategoriaRepository.GetById(c => c.CategoriaId == id);
