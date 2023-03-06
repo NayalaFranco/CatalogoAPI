@@ -45,32 +45,39 @@ namespace CatalogoAPI.Controllers
         public async Task<ActionResult<IEnumerable<CategoriaDTO>>>
             GetCategorias([FromQuery] CategoriasParameters categoriasParameters)
         {
-            //throw new Exception();
-
-            // isso será logado no console
-            _logger.LogInformation("========== GET api/categorias =============");
-
-            var categorias = await _uow.CategoriaRepository.GetCategorias(categoriasParameters);
-            if (categorias is null)
-                return NotFound("Categorias não encontradas...");
-
-            // Cria um metadata adicionar os dados de paginação no header do response
-            var metadata = new
+            try
             {
-                categorias.TotalCount,
-                categorias.PageSize,
-                categorias.CurrentPage,
-                categorias.TotalPages,
-                categorias.HasNext,
-                categorias.HasPrevious
-            };
+                //throw new Exception();
 
-            // Serializa em Json o metadata e adiciona no Header do Response.
-            Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(metadata));
+                // isso será logado no console
+                _logger.LogInformation("========== GET api/categorias =============");
 
-            var categoriasDto = _mapper.Map<List<CategoriaDTO>>(categorias);
+                var categorias = await _uow.CategoriaRepository.GetCategorias(categoriasParameters);
+                if (categorias is null)
+                    return NotFound("Categorias não encontradas...");
 
-            return Ok(categoriasDto);
+                // Cria um metadata adicionar os dados de paginação no header do response
+                var metadata = new
+                {
+                    categorias.TotalCount,
+                    categorias.PageSize,
+                    categorias.CurrentPage,
+                    categorias.TotalPages,
+                    categorias.HasNext,
+                    categorias.HasPrevious
+                };
+
+                // Serializa em Json o metadata e adiciona no Header do Response.
+                Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(metadata));
+
+                var categoriasDto = _mapper.Map<List<CategoriaDTO>>(categorias);
+
+                return Ok(categoriasDto);
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
         }
 
         /// <summary>
@@ -220,7 +227,7 @@ namespace CatalogoAPI.Controllers
             _uow.CategoriaRepository.Update(categoria);
             await _uow.Commit();
 
-            return Ok(categoriaDto);
+            return Ok();
         }
 
 
@@ -233,7 +240,7 @@ namespace CatalogoAPI.Controllers
         [ProducesResponseType(typeof(CategoriaDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         [ProducesDefaultResponseType]
-        public async Task<ActionResult> DeleteCategoria(int id)
+        public async Task<ActionResult<CategoriaDTO>> DeleteCategoria(int id)
         {
             var categoria = await _uow.CategoriaRepository.GetById(c => c.CategoriaId == id);
 
@@ -243,7 +250,7 @@ namespace CatalogoAPI.Controllers
             _uow.CategoriaRepository.Delete(categoria);
             await _uow.Commit();
 
-            var categoriaDto = _mapper.Map<Categoria>(categoria);
+            var categoriaDto = _mapper.Map<CategoriaDTO>(categoria);
 
             return Ok(categoriaDto);
         }
