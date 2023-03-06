@@ -56,7 +56,7 @@ namespace CatalogoAPI.Controllers
         ///     {
         ///         "email": "email@email.com",
         ///         "password": "S3nh@F0rte",
-        ///         "confirmaPassword": "S3nh@F0rte"
+        ///         "confirmPassword": "S3nh@F0rte"
         ///     }     
         /// </remarks>
         /// <returns>Retorna a confirmação ou falha do cadastro</returns>
@@ -100,7 +100,7 @@ namespace CatalogoAPI.Controllers
         ///     {
         ///         "email": "email@email.com",
         ///         "password": "S3nh@F0rte",
-        ///         "confirmaPassword": "S3nh@F0rte"
+        ///         "confirmPassword": "S3nh@F0rte"
         ///     }     
         /// </remarks>
         /// <returns>Status 200 OK e retorna o token JWT</returns>
