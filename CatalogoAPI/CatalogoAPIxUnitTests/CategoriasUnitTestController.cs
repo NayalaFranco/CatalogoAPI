@@ -19,6 +19,7 @@ namespace CatalogoAPIxUnitTests
 
         private IMapper mapper;
         private IUnitOfWork repository;
+        private CategoriasController controller;
 
         public static DbContextOptions<CatalogoAPIContext> dbContextOption { get; }
 
@@ -54,6 +55,15 @@ namespace CatalogoAPIxUnitTests
             //db.Seed(context);
 
             repository = new UnitOfWork(context);
+
+            // Código compartilhado do Arrange
+            controller = new CategoriasController(repository, new NullLogger<CategoriasController>(), mapper);
+
+            // Esse HttpContext é para parar de dar erro no código "Response.Headers.Add"
+            controller.ControllerContext = new ControllerContext()
+            {
+                HttpContext = new DefaultHttpContext(),
+            };
         }
 
         // Testes Unitários
@@ -65,13 +75,7 @@ namespace CatalogoAPIxUnitTests
         public async Task GetCategorias_Return_OkResult()
         {
             // Arrange
-            var controller = new CategoriasController(repository, new NullLogger<CategoriasController>(), mapper);
-
-            // Esse HttpContext é para parar de dar erro no código "Response.Headers.Add"
-            controller.ControllerContext = new ControllerContext()
-            {
-                HttpContext = new DefaultHttpContext(),
-            };
+            // O var controller e o httpcontext pode e foi passado para o construtor para não repetir código
 
             CategoriasParameters parameters = new CategoriasParameters()
             {
@@ -93,7 +97,7 @@ namespace CatalogoAPIxUnitTests
         public async Task GetCategorias_Return_BadRequestResult()
         {
             // Arrange
-            var controller = new CategoriasController(repository, new NullLogger<CategoriasController>(), mapper);
+            // O var controller pode e foi passado para o construtor para exemplificar como não repetir código
 
             // Act
             // Esse null vai forçar um nullexception que o trycatch vai pegar e devolver como badrequest
@@ -107,13 +111,7 @@ namespace CatalogoAPIxUnitTests
         public async Task GetCategorias_MatchResult()
         {
             // Arrange
-            var controller = new CategoriasController(repository, new NullLogger<CategoriasController>(), mapper);
-
-            // Esse HttpContext é para parar de dar erro no código "Response.Headers.Add"
-            controller.ControllerContext = new ControllerContext()
-            {
-                HttpContext = new DefaultHttpContext(),
-            };
+            // O var controller e o httpcontext pode e foi passado para o construtor para exemplificar como não repetir código
 
             CategoriasParameters parameters = new CategoriasParameters()
             { };
@@ -137,7 +135,7 @@ namespace CatalogoAPIxUnitTests
         public async Task GetCategoriasId_Return_OkResult()
         {
             // Arrange
-            var controller = new CategoriasController(repository, new NullLogger<CategoriasController>(), mapper);
+            // O var controller pode e foi passado para o construtor para exemplificar como não repetir código
             int catId = 2;
 
             // Act
@@ -152,7 +150,7 @@ namespace CatalogoAPIxUnitTests
         public async Task GetCategoriasId_Return_NotFound()
         {
             // Arrange
-            var controller = new CategoriasController(repository, new NullLogger<CategoriasController>(), mapper);
+            // O var controller pode e foi passado para o construtor para exemplificar como não repetir código
             int catId = 9999999;
 
             // Act
@@ -168,7 +166,8 @@ namespace CatalogoAPIxUnitTests
         public async Task PostCategoria_AddValidData_Return_CreatedResult()
         {
             // Arrange
-            var controller = new CategoriasController(repository, new NullLogger<CategoriasController>(), mapper);
+            // O var controller pode e foi passado para o construtor para exemplificar como não repetir código
+
             var cat = new CategoriaDTO()
             {
                 Nome = "Teste Unitario Inclusao",
@@ -187,8 +186,8 @@ namespace CatalogoAPIxUnitTests
         public async Task PutCategoria_Update_ValidData_Return_OkResult()
         {
             // Arrange
-            var controller = new CategoriasController(repository, new NullLogger<CategoriasController>(), mapper);
-            var catId = 4;
+            // O var controller pode e foi passado para o construtor para exemplificar como não repetir código
+            var catId = 7;
 
             // Act
             var existingPost = await controller.GetCategoriasId(catId);
@@ -211,8 +210,8 @@ namespace CatalogoAPIxUnitTests
         public async Task DeleteCategoria_Return_OkResult()
         {
             // Arrange
-            var controller = new CategoriasController(repository, new NullLogger<CategoriasController>(), mapper);
-            var catId = 4;
+            // O var controller pode e foi passado para o construtor para exemplificar como não repetir código
+            var catId = 6;
 
             // Act
             var data = await controller.DeleteCategoria(catId);
