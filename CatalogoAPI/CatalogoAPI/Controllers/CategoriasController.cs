@@ -16,7 +16,7 @@ namespace CatalogoAPI.Controllers
     // com a opção de mostrar no formato application/json selecionada.
     [Produces("application/json")]
 
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
     // Faz a controladora exigir autenticação do tipo bearer para os requests.
     [Authorize(AuthenticationSchemes = "Bearer")]
